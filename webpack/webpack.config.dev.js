@@ -14,44 +14,48 @@ module.exports = merge(webpackConfigCommon, {
   output: {
     filename: "[name].bundle.js",
   },
-  //   module: {
-  //     rules: [
-  //       {
-  //         test: /\.(s?css)$/,
-  //         use: [
-  //           {
-  //             loader: "style-loader",
-  //           },
-  //           {
-  //             loader: "css-loader",
-  //           },
-  //           {
-  //             loader: "postcss-loader",
-  //             options: {
-  //               plugins: function () {
-  //                 return [require("precss"), require("autoprefixer")];
-  //               },
-  //             },
-  //           },
-  //           {
-  //             loader: "sass-loader",
-  //           },
-  //         ],
-  //         exclude: /node_modules/,
-  //       },
-  //       {
-  //         test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)$/,
-  //         use: [
-  //           {
-  //             loader: "file-loader",
-  //             options: {
-  //               name: "[path][name].[ext]",
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   },
+    module: {
+      rules: [
+        {
+          test: /\.(s?css)$/,
+          use: [
+            {
+              loader: "style-loader",
+            },
+            {
+              loader: "css-loader",
+            },
+            {
+              loader: "postcss-loader",
+              options: {
+                postcssOptions: {
+                  plugins: function () {
+                    return [require("precss"), require("autoprefixer")];
+                  },
+                },
+              },
+            },
+            {
+              loader: "sass-loader",
+            },
+          ],
+          exclude: /node_modules/,
+        },
+        {
+          test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)$/,
+          use: [
+            {
+              loader: "file-loader",
+              options: {
+                name: "[path][name].[ext]",
+                outputPath: (url) => url.replace('src/', ''),
+              },
+            },
+          ],
+          exclude: /node_modules/,
+        },
+      ],
+    },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "../src/index.html"),
