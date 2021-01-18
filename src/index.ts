@@ -1,6 +1,7 @@
-import "./index.scss";
+import './index.scss';
 
-const path = require("./assets/images/img.png").default;
+/* eslint-disable-next-line */
+const path = require('./assets/images/img.png').default;
 console.log(path);
 
 interface TestObject {
@@ -8,7 +9,7 @@ interface TestObject {
 }
 
 const obj: TestObject = {
-  testValue: "test",
+  testValue: 'test',
 };
 
 console.log(obj.testValue);
