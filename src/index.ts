@@ -1,15 +1,25 @@
 import './index.scss';
 
+import { SimpleEventEmitter } from './application/core/simple-event-emitter/simple-event-emitter.class';
+
 /* eslint-disable-next-line */
 const path = require('./assets/images/img.png').default;
 console.log(path);
 
-interface TestObject {
-  testValue: string;
-}
+const emitter = new SimpleEventEmitter<number>();
+const event = emitter.asEvent();
 
-const obj: TestObject = {
-  testValue: 'test',
-};
+emitter.emit(0);
 
-console.log(obj.testValue);
+const sub1 = event.subscribe((value) => console.log('handle1', value));
+const sub2 = event.subscribe((value) => console.log('handle2', value));
+
+emitter.emit(1);
+
+sub1.unsubscribe();
+
+emitter.emit(2);
+
+sub2.unsubscribe();
+
+emitter.emit(3);
