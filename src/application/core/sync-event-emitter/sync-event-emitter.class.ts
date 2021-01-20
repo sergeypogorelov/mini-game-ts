@@ -32,9 +32,7 @@ export class SyncEventEmitter<T> implements SyncEvent<T> {
     const subscription: SyncEventSubscription = {
       unsubscribe: () => {
         const foundIndex = this._handlers.indexOf(wrappedEventHandler);
-        if (foundIndex !== -1) {
-          this._handlers.splice(foundIndex, 1);
-        }
+        this._handlers.splice(foundIndex, 1);
       },
     };
 
