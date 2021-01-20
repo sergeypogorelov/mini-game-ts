@@ -1,12 +1,12 @@
 import './index.scss';
 
-import { SimpleEventEmitter } from './application/core/simple-event-emitter/simple-event-emitter.class';
+import { SyncEventEmitter } from './application/core/sync-event-emitter/sync-event-emitter.class';
 
 /* eslint-disable-next-line */
 const path = require('./assets/images/img.png').default;
 console.log(path);
 
-const emitter = new SimpleEventEmitter<number>();
+const emitter = new SyncEventEmitter<number>();
 const event = emitter.asEvent();
 
 emitter.emit(0);
