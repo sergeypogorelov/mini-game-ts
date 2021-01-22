@@ -1,10 +1,23 @@
 import './index.scss';
 
+import { Component } from './application/ui/common/component/component.class';
 import { View } from './application/ui/common/view/view.class';
 
 /* eslint-disable-next-line */
 const path = require('./assets/images/img.png').default;
 console.log(path);
+
+class TestComponent extends Component<TestView> {
+  public setTitle(value?: string): void {
+    if (!value) {
+      value = 'World';
+    }
+
+    value = `Hello ${value}`;
+
+    this.view.setTitle(value);
+  }
+}
 
 class TestView extends View<HTMLDivElement> {
   public constructor() {
@@ -19,14 +32,14 @@ class TestView extends View<HTMLDivElement> {
   }
 
   public setTitle(value: string) {
-    const titleElement = this.querySelector('h1') as HTMLHeadingElement;
+    const titleElement = this.getElementByTagName('h1');
     titleElement.textContent = value;
   }
 }
 
-const testView = new TestView();
+const testComponent = new TestComponent(new TestView());
 
-testView.onInit();
-testView.setTitle('Hello World!');
+testComponent.onInit();
+testComponent.setTitle();
 
-document.getElementById('root').appendChild(testView.host);
+document.getElementById('root').appendChild(testComponent.view.host);
