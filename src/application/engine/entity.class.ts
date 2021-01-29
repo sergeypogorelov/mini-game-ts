@@ -1,20 +1,22 @@
 import { RenderingContext } from './rendering-context.interface';
+import { RenderingData } from './rendering-data.interface';
 
 import { Point } from './point.class';
 import { Size } from './size.class';
-import { RenderingData } from './rendering-data.interface';
 
 export abstract class Entity {
-  public get location(): Point {
-    return this._location;
+  public abstract get imageTag(): string;
+
+  public get coordinates(): Point {
+    return this._coordinates;
   }
 
-  public set location(value: Point) {
+  public set coordinates(value: Point) {
     if (!value) {
       throw new Error('Location is not specified.');
     }
 
-    this._location = value;
+    this._coordinates = value;
   }
 
   public get size(): Size {
@@ -29,16 +31,16 @@ export abstract class Entity {
     this._size = value;
   }
 
-  public constructor(point?: Point, size?: Size) {
-    if (!point) {
-      point = new Point();
+  public constructor(coordinates?: Point, size?: Size) {
+    if (!coordinates) {
+      coordinates = new Point();
     }
 
     if (!size) {
       size = new Size();
     }
 
-    this.location = point;
+    this.coordinates = coordinates;
     this.size = size;
   }
 
@@ -55,9 +57,9 @@ export abstract class Entity {
     const heightScale = context.height / mapSize.height;
 
     const data: RenderingData = {
-      sourceTag: '',
-      x: this.location.x * widthScale,
-      y: this.location.y * heightScale,
+      imageTag: this.imageTag,
+      x: this.coordinates.x * widthScale,
+      y: this.coordinates.y * heightScale,
       width: this.size.width * widthScale,
       height: this.size.height * heightScale,
     };
@@ -65,7 +67,7 @@ export abstract class Entity {
     context.draw(data);
   }
 
-  private _location: Point;
+  private _coordinates: Point;
 
   private _size: Size;
 }

@@ -2,7 +2,7 @@ export interface RenderingData {
   /**
    * tag of an image or sprite
    */
-  sourceTag: string;
+  imageTag: string;
 
   /**
    * X coordinate on the context of the image to draw
