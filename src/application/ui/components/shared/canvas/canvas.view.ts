@@ -1,13 +1,13 @@
 import { RenderingContext } from '../../../../engine/rendering-context.interface';
 
+import { AssetPathes } from '../../../common/asset-pathes/asset-pathes.class';
 import { ImageLoader } from '../../../common/image-loader/image-loader.class';
 import { View } from '../../../common/view/view.class';
 
+import { ImageTags } from '../../../../game/image-tags.enum';
 import { TestMap } from '../../../../game/test-map.class';
 
 import { CanvasConfig } from './canvas-config.class';
-import { AssetPathes } from '../../../common/asset-pathes/asset-pathes.class';
-import { AssetTags } from '../../../../game/asset-tags.enum';
 
 export class CanvasView extends View<HTMLCanvasElement> {
   public constructor(cfg?: CanvasConfig) {
@@ -30,7 +30,7 @@ export class CanvasView extends View<HTMLCanvasElement> {
 
   public drawEntity(): void {
     const imageLoader = new ImageLoader();
-    const imgUrl = AssetPathes.getPathByTag(AssetTags.TestImage);
+    const imgUrl = AssetPathes.getImagePathByTag(ImageTags.Test);
 
     imageLoader
       .load(imgUrl)
