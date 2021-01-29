@@ -1,9 +1,9 @@
 import { CanvasConfigScheme } from './canvas-config-scheme.interface';
 
 export class CanvasConfig implements CanvasConfigScheme {
-  public static readonly minWidth = 640;
+  public static readonly minWidth = 320;
 
-  public static readonly minHeight = 480;
+  public static readonly minHeight = 240;
 
   public static generateDefault(): CanvasConfig {
     const scheme: CanvasConfigScheme = {
