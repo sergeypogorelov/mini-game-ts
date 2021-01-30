@@ -1,11 +1,12 @@
 import { RenderingContext } from '../../../../engine/rendering-context.interface';
 
-import { AssetPathes } from '../../../common/asset-pathes/asset-pathes.class';
-import { ImageLoader } from '../../../common/image-loader/image-loader.class';
-import { View } from '../../../common/view/view.class';
-
 import { ImageTags } from '../../../../game/image-tags.enum';
 import { TestMap } from '../../../../game/test-map.class';
+
+import { ResourceLoadRequest } from '../../../common/resource-loader/resource-load-request.interface';
+import { ResourceLoader } from '../../../common/resource-loader/resource-loader.class';
+import { AssetPathes } from '../../../common/asset-pathes/asset-pathes.class';
+import { View } from '../../../common/view/view.class';
 
 import { CanvasConfig } from './canvas-config.class';
 
@@ -29,13 +30,16 @@ export class CanvasView extends View<HTMLCanvasElement> {
   }
 
   public drawEntity(): void {
-    const imageLoader = new ImageLoader();
     const imgUrl = AssetPathes.getImagePathByTag(ImageTags.Test);
+    const loadRequest: ResourceLoadRequest = {
+      imageUrls: [imgUrl],
+    };
 
-    imageLoader
-      .load(imgUrl)
-      .then((element) => {
+    ResourceLoader.getInstance()
+      .load(loadRequest)
+      .then((result) => {
         const map = new TestMap();
+        const element = result.images[0].content;
 
         const context: RenderingContext = {
           width: this._cfg.width,
