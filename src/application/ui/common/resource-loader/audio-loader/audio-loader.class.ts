@@ -19,7 +19,10 @@ export class AudioLoader extends AbstractLoader<HTMLAudioElement> {
         reject(ev);
       };
 
+      audioElement.controls = false;
+      audioElement.preload = 'auto';
       audioElement.style.display = 'none';
+
       audioElement.src = url;
 
       document.body.appendChild(audioElement);
