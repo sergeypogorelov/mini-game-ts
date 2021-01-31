@@ -4,12 +4,16 @@ export abstract class AbstractLoader<T> {
   }
 
   public load(urls: string[]): Promise<T[]> {
-    if (!urls || urls.length === 0) {
+    if (!urls) {
       throw new Error('URLs are not specified.');
     }
 
     if (this.loading) {
       throw new Error('Loading is already in progress.');
+    }
+
+    if (urls.length === 0) {
+      return Promise.resolve<T[]>([]);
     }
 
     this._loading = true;

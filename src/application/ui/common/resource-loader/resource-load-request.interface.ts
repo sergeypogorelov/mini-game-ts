@@ -1,3 +1,4 @@
 export interface ResourceLoadRequest {
-  imageUrls: string[];
+  imageUrls?: string[];
+  audioUrls?: string[];
 }

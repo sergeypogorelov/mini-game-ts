@@ -1,11 +1,12 @@
 import { RenderingContext } from '../../../../engine/rendering-context.interface';
 
 import { ImageTags } from '../../../../game/image-tags.enum';
+import { AudioTags } from '../../../../game/audio-tags.enum';
 import { TestMap } from '../../../../game/test-map.class';
 
 import { ResourceLoadRequest } from '../../../common/resource-loader/resource-load-request.interface';
 import { ResourceLoader } from '../../../common/resource-loader/resource-loader.class';
-import { AssetPathes } from '../../../common/asset-pathes/asset-pathes.class';
+import { AssetPaths } from '../../../common/asset-paths/asset-paths.class';
 import { View } from '../../../common/view/view.class';
 
 import { CanvasConfig } from './canvas-config.class';
@@ -30,9 +31,12 @@ export class CanvasView extends View<HTMLCanvasElement> {
   }
 
   public drawEntity(): void {
-    const imgUrl = AssetPathes.getImagePathByTag(ImageTags.Test);
+    const imgUrl = AssetPaths.getImagePathByTag(ImageTags.Test);
+    const sndUrl = AssetPaths.getAudioPathByTag(AudioTags.Test);
+
     const loadRequest: ResourceLoadRequest = {
       imageUrls: [imgUrl],
+      audioUrls: [sndUrl],
     };
 
     ResourceLoader.getInstance()
@@ -60,6 +64,10 @@ export class CanvasView extends View<HTMLCanvasElement> {
         };
 
         map.render(context);
+
+        this.host.onclick = () => {
+          result.sounds[0].content.play();
+        };
       })
       .catch((err) => console.error(err));
   }

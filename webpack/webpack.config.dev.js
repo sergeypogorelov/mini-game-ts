@@ -46,7 +46,7 @@ module.exports = merge(webpackConfigCommon, {
         exclude: /node_modules/,
       },
       {
-        test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)$/,
+        test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|m4a)$/,
         use: [
           {
             loader: 'file-loader',
