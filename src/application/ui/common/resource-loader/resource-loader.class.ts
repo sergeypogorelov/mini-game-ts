@@ -35,8 +35,8 @@ export class ResourceLoader {
       Promise.all(promises)
         .then(([imageResults, audioResults]) => {
           const result: ResourceLoadResult = {
-            images: (request.imageUrls ?? []).map((url, index) => ({ url, content: imageResults[index] })),
-            sounds: (request.audioUrls ?? []).map((url, index) => ({ url, content: audioResults[index] })),
+            images: (request.imageUrls ?? []).map((url, index) => ({ url, element: imageResults[index] })),
+            sounds: (request.audioUrls ?? []).map((url, index) => ({ url, element: audioResults[index] })),
           };
 
           resolve(result);

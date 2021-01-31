@@ -43,7 +43,7 @@ export class CanvasView extends View<HTMLCanvasElement> {
       .load(loadRequest)
       .then((result) => {
         const map = new TestMap();
-        const element = result.images[0].content;
+        const element = result.images[0].element;
 
         const context: RenderingContext = {
           width: this._cfg.width,
@@ -66,7 +66,7 @@ export class CanvasView extends View<HTMLCanvasElement> {
         map.render(context);
 
         this.host.onclick = () => {
-          result.sounds[0].content.play();
+          result.sounds[0].element.play();
         };
       })
       .catch((err) => console.error(err));
