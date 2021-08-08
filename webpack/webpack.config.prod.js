@@ -1,6 +1,8 @@
 const path = require('path');
 const { merge } = require('webpack-merge');
 
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -16,9 +18,41 @@ module.exports = merge(
         },
         optimization: {
             minimize: true,
-            minimizer: [new TerserPlugin()],
+            minimizer: [new TerserPlugin(), new OptimizeCssAssetsWebpackPlugin()],
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.css$/,
+                    use: [
+                        {
+                            loader: MiniCssExtractPlugin.loader,
+                        },
+                        {
+                            loader: 'css-loader',
+                        },
+                    ],
+                    exclude: /node_modules/,
+                },
+                {
+                    test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)$/,
+                    use: [
+                      {
+                        loader: 'file-loader',
+                        options: {
+                          name: '[path][name].[hash].[ext]',
+                          outputPath: (url) => url.replace('src/', ''),
+                        },
+                      },
+                    ],
+                    exclude: /node_modules/,
+                  },
+            ],
         },
         plugins: [
+            new MiniCssExtractPlugin({
+                filename: '[name].[fullhash].css',
+            }),
             new HtmlWebpackPlugin({
                 template: path.resolve(__dirname, '../src/index.html'),
                 minify: {
