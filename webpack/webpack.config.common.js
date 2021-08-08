@@ -6,13 +6,22 @@ module.exports = merge(
     {
         target: ['web', 'es5'],
         resolve: {
-            extensions: ['.js'],
+            extensions: ['.ts', '.js'],
         },
         entry: {
-            main: path.resolve(__dirname, '../src/index.js'),
+            main: path.resolve(__dirname, '../src/index.ts'),
         },
         output: {
             path: path.resolve(__dirname, '../dist'),
         },
-    }
+        module: {
+            rules: [
+                {
+                    test: /\.ts$/,
+                    use: 'ts-loader',
+                    exclude: /node_modules/,
+                },
+            ],
+        },
+    },
 );
