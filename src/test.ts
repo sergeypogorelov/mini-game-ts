@@ -1,3 +1,3 @@
 export class Test {
-    public static test = 'test';
+  public static test = 'test';
 }

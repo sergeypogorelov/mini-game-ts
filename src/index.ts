@@ -2,6 +2,7 @@ import './index.css';
 
 import { Test } from './test';
 
+/* eslint-disable-next-line */
 const imgSrc = require('./assets/images/img.png').default;
 
 const imgEl = new Image();
