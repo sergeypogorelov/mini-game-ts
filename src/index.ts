@@ -1,12 +1,44 @@
 import './index.css';
 
-import { Test } from './test';
+import { imgUrl, spriteFrames, spriteUrl } from './assets';
+import { IDrawableSprite } from './app/engine/drawable-sprite.interface';
+import { SpriteAnimation } from './app/engine/sprite-animation';
 
-/* eslint-disable-next-line */
-const imgSrc = require('./assets/images/img.png').default;
+const canvasEl = document.getElementById('canvas') as HTMLCanvasElement;
 
-const imgEl = new Image();
-imgEl.src = imgSrc;
-document.body.appendChild(imgEl);
+canvasEl.width = 640;
+canvasEl.height = 480;
 
-document.getElementById('header').innerText = Test.test;
+const context = canvasEl.getContext('2d');
+
+const sprite = new Image();
+sprite.src = spriteUrl;
+sprite.onload = () => {
+  document.body.removeChild(sprite);
+
+  const drawableSprite: IDrawableSprite = {
+    draw(sx: number, sy: number, sw: number, sh: number) {
+      context.fillStyle = '#fff';
+      context.fillRect(0, 0, canvasEl.width, canvasEl.height);
+      context.drawImage(sprite, sx, sy, sw, sh, 0, 0, 100, 110);
+    },
+  };
+
+  const spriteAnimation = SpriteAnimation.createFromArray(spriteFrames, 10);
+
+  let prevDate = new Date();
+
+  const callback = () => {
+    const newDate = new Date();
+    const dt = newDate.getTime() - prevDate.getTime();
+    spriteAnimation.update(dt);
+    spriteAnimation.render(drawableSprite);
+    prevDate = newDate;
+
+    requestAnimationFrame(() => callback());
+  };
+
+  requestAnimationFrame(() => callback());
+};
+
+document.body.appendChild(sprite);
