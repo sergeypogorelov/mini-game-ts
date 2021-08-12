@@ -1,8 +1,10 @@
 import './index.css';
 
-import { imgUrl, spriteFrames, spriteUrl } from './assets';
-import { IDrawableSprite } from './app/engine/drawable-sprite.interface';
+import { spriteFrames, spriteUrl } from './assets';
+
 import { SpriteAnimation } from './app/engine/sprite-animation';
+import { IDrawable, IDrawParams } from './app/engine/drawable.interface';
+import { Sprite } from './app/engine/sprite';
 
 const canvasEl = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -11,20 +13,23 @@ canvasEl.height = 480;
 
 const context = canvasEl.getContext('2d');
 
-const sprite = new Image();
-sprite.src = spriteUrl;
-sprite.onload = () => {
-  document.body.removeChild(sprite);
+const spriteImg = new Image();
+spriteImg.src = spriteUrl;
+spriteImg.onload = () => {
+  document.body.removeChild(spriteImg);
 
-  const drawableSprite: IDrawableSprite = {
-    draw(sx: number, sy: number, sw: number, sh: number) {
+  const drawableObj: IDrawable = {
+    draw(params: IDrawParams) {
       context.fillStyle = '#fff';
       context.fillRect(0, 0, canvasEl.width, canvasEl.height);
-      context.drawImage(sprite, sx, sy, sw, sh, 0, 0, 100, 110);
+
+      const { sx, sy, sw, sh, dx, dy, dw, dh } = params;
+      context.drawImage(spriteImg, sx, sy, sw, sh, dx, dy, dw, dh);
     },
   };
 
-  const spriteAnimation = SpriteAnimation.createFromArray(spriteFrames, 10);
+  const sprite = Sprite.createFromArray(spriteFrames);
+  const spriteAnimation = new SpriteAnimation({ sprite, isInfinite: true });
 
   let prevDate = new Date();
 
@@ -32,7 +37,7 @@ sprite.onload = () => {
     const newDate = new Date();
     const dt = newDate.getTime() - prevDate.getTime();
     spriteAnimation.update(dt);
-    spriteAnimation.render(drawableSprite);
+    spriteAnimation.render({ context: drawableObj, dx: 0, dy: 0 });
     prevDate = newDate;
 
     requestAnimationFrame(() => callback());
@@ -41,4 +46,4 @@ sprite.onload = () => {
   requestAnimationFrame(() => callback());
 };
 
-document.body.appendChild(sprite);
+document.body.appendChild(spriteImg);

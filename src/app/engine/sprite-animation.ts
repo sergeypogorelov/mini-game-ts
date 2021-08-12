@@ -1,49 +1,65 @@
-import { IDrawableSprite } from './drawable-sprite.interface';
-import { ISpriteFrame } from './sprite-frame.interface';
 import { IUpdateable } from './updateable.interface';
+import { IDrawable, IDrawParams } from './drawable.interface';
+import { ISpriteFrame } from './sprite-frame.interface';
+
+import { Sprite } from './sprite';
+
+export interface ISpriteAnimationConfig {
+  readonly sprite: Sprite;
+
+  readonly isInfinite?: boolean;
+  readonly speed?: number;
+}
+
+export interface ISpriteRenderParams {
+  readonly context: IDrawable;
+  readonly dx: number;
+  readonly dy: number;
+
+  readonly dw?: number;
+  readonly dh?: number;
+}
 
 export class SpriteAnimation implements IUpdateable {
-  public get speed(): number {
-    return this._speed;
+  public static readonly defSpeed = 12;
+
+  public get config(): ISpriteAnimationConfig {
+    return this._config;
   }
 
-  public get frames(): ISpriteFrame[] {
-    return this._frames;
+  public get timePerFrame(): number {
+    return 1000 / this.config.speed;
   }
 
-  public get currentFrame(): ISpriteFrame {
-    const index = Math.floor(this._dt / (1000 / this.speed));
-    if (index === this.frames.length - 1) {
-      this.reset();
-    }
-    return this._frames[index];
+  public get timePerAllFrames(): number {
+    return this.timePerFrame * this.config.sprite.frames.length;
   }
 
-  private _dt: number;
-
-  private _speed: number;
-
-  private _frames: ISpriteFrame[];
-
-  public static createFromArray(frames: number[][], speed: number): SpriteAnimation {
-    if (!frames) {
-      throw new Error('Frames are not specified.');
-    }
-
-    return new SpriteAnimation(
-      frames.map((f) => ({ x: f[0], y: f[1], width: f[2], height: f[3] })),
-      speed,
-    );
-  }
-
-  public constructor(frames: ISpriteFrame[], speed: number) {
-    this.setSpeed(speed);
-    this.setFrames(frames);
-
+  public constructor(config: ISpriteAnimationConfig) {
+    this.setConfig(config);
     this.reset();
   }
 
+  public getCurrentFrame(): ISpriteFrame {
+    let index = Math.floor(this._dt / this.timePerFrame);
+
+    const { frames } = this.config.sprite;
+    if (index >= frames.length) {
+      index = frames.length - 1;
+    }
+
+    return frames[index];
+  }
+
   public update(dt: number): void {
+    if (this._dt + dt >= this.timePerAllFrames) {
+      if (!this.config.isInfinite) {
+        return;
+      }
+
+      this.reset();
+    }
+
     this._dt += dt;
   }
 
@@ -51,29 +67,32 @@ export class SpriteAnimation implements IUpdateable {
     this._dt = 0;
   }
 
-  public render(drawableObject: IDrawableSprite): void {
-    const { x, y, width, height } = this.currentFrame;
+  public render(params: ISpriteRenderParams): void {
+    const { context, dx, dy, dw, dh } = params;
+    const { x: sx, y: sy, width: sw, height: sh } = this.getCurrentFrame();
 
-    drawableObject.draw(x, y, width, height);
+    const drawParams: IDrawParams = { sx, sy, sw, sh, dx, dy, dw: dw ?? sw, dh: dh ?? sh };
+
+    context.draw(drawParams);
   }
 
-  private setSpeed(speed: number): void {
-    if (speed <= 0) {
-      throw new Error('Speed should be greater than 0.');
+  private _dt: number;
+
+  private _config: ISpriteAnimationConfig;
+
+  private setConfig(cfg: ISpriteAnimationConfig): void {
+    if (!cfg) {
+      throw new Error('Sprite animation config is not defined.');
     }
 
-    this._speed = speed;
-  }
-
-  private setFrames(frames: ISpriteFrame[]): void {
-    if (!frames) {
-      throw new Error('Sprite frames are not specified.');
+    if (!cfg.sprite) {
+      throw new Error('Sprite is not found in sprite animation config.');
     }
 
-    if (frames.length === 0) {
-      throw new Error('Sprite frames are not found.');
-    }
-
-    this._frames = frames;
+    this._config = {
+      sprite: cfg.sprite,
+      speed: cfg.speed ?? SpriteAnimation.defSpeed,
+      isInfinite: cfg.isInfinite ?? false,
+    };
   }
 }
