@@ -1,4 +1,9 @@
-import { ISpriteFrame } from './sprite-frame.interface';
+export interface ISpriteFrame {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 export class Sprite {
   public get frames(): ISpriteFrame[] {

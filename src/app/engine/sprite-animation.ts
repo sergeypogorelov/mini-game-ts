@@ -1,8 +1,7 @@
 import { IUpdateable } from './updateable.interface';
 import { IDrawable, IDrawParams } from './drawable.interface';
-import { ISpriteFrame } from './sprite-frame.interface';
 
-import { Sprite } from './sprite';
+import { ISpriteFrame, Sprite } from './sprite';
 
 export interface ISpriteAnimationConfig {
   readonly sprite: Sprite;

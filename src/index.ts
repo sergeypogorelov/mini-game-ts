@@ -2,9 +2,10 @@ import './index.css';
 
 import { spriteFrames, spriteUrl } from './assets';
 
-import { SpriteAnimation } from './app/engine/sprite-animation';
 import { IDrawable, IDrawParams } from './app/engine/drawable.interface';
+
 import { Sprite } from './app/engine/sprite';
+import { SpriteAnimation } from './app/engine/sprite-animation';
 
 const canvasEl = document.getElementById('canvas') as HTMLCanvasElement;
 
