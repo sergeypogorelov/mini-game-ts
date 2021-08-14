@@ -24,7 +24,13 @@ spriteImg.onload = () => {
       context.fillStyle = '#fff';
       context.fillRect(0, 0, canvasEl.width, canvasEl.height);
 
-      const { sx, sy, sw, sh, dx, dy, dw, dh } = params;
+      const { srcPoint, srcSize, distPoint, distSize } = params;
+
+      const { x: sx, y: sy } = srcPoint;
+      const { width: sw, height: sh } = srcSize;
+      const { x: dx, y: dy } = distPoint;
+      const { width: dw, height: dh } = distSize;
+
       context.drawImage(spriteImg, sx, sy, sw, sh, dx, dy, dw, dh);
     },
   };
@@ -37,8 +43,10 @@ spriteImg.onload = () => {
   const callback = () => {
     const newDate = new Date();
     const dt = newDate.getTime() - prevDate.getTime();
+
     spriteAnimation.update(dt);
-    spriteAnimation.render({ context: drawableObj, dx: 0, dy: 0 });
+    spriteAnimation.render({ context: drawableObj, distPoint: { x: 0, y: 0 } });
+
     prevDate = newDate;
 
     requestAnimationFrame(() => callback());

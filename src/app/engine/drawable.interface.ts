@@ -1,12 +1,11 @@
+import { IPoint } from './point.interface';
+import { ISize } from './size.interface';
+
 export interface IDrawParams {
-  sx: number;
-  sy: number;
-  sw: number;
-  sh: number;
-  dx: number;
-  dy: number;
-  dw: number;
-  dh: number;
+  srcPoint: IPoint;
+  srcSize: ISize;
+  distPoint: IPoint;
+  distSize: ISize;
 }
 
 export interface IDrawable {

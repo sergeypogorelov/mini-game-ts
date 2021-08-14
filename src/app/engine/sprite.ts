@@ -1,8 +1,9 @@
+import { IPoint } from './point.interface';
+import { ISize } from './size.interface';
+
 export interface ISpriteFrame {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  srcPoint: IPoint;
+  srcSize: ISize;
 }
 
 export class Sprite {
@@ -25,7 +26,7 @@ export class Sprite {
       throw new Error('Frames are not specified.');
     }
 
-    return new Sprite(frames.map((i) => ({ x: i[0], y: i[1], width: i[2], height: i[3] })));
+    return new Sprite(frames.map((i) => ({ srcPoint: { x: i[0], y: i[1] }, srcSize: { width: i[2], height: i[3] } })));
   }
 
   private setFrames(frames: ISpriteFrame[]): void {
