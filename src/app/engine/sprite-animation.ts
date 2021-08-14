@@ -1,9 +1,9 @@
 import { IUpdateable } from './updateable.interface';
 import { IDrawable, IDrawParams } from './drawable.interface';
 
+import { Point } from './point';
+import { Size } from './size';
 import { ISpriteFrame, Sprite } from './sprite';
-import { IPoint } from './point.interface';
-import { ISize } from './size.interface';
 
 export interface ISpriteAnimationConfig {
   readonly sprite: Sprite;
@@ -14,24 +14,20 @@ export interface ISpriteAnimationConfig {
 
 export interface ISpriteRenderParams {
   readonly context: IDrawable;
-  readonly distPoint: IPoint;
+  readonly distPoint: Point;
 
-  readonly distSize?: ISize;
+  readonly distSize?: Size;
 }
 
 export class SpriteAnimation implements IUpdateable {
   public static readonly defSpeed = 12;
 
-  public get config(): ISpriteAnimationConfig {
-    return this._config;
-  }
-
   public get timePerFrame(): number {
-    return 1000 / this.config.speed;
+    return 1000 / this._config.speed;
   }
 
   public get timePerAllFrames(): number {
-    return this.timePerFrame * this.config.sprite.frames.length;
+    return this.timePerFrame * this._config.sprite.frames.length;
   }
 
   public constructor(config: ISpriteAnimationConfig) {
@@ -42,7 +38,7 @@ export class SpriteAnimation implements IUpdateable {
   public getCurrentFrame(): ISpriteFrame {
     let index = Math.floor(this._dt / this.timePerFrame);
 
-    const { frames } = this.config.sprite;
+    const { frames } = this._config.sprite;
     if (index >= frames.length) {
       index = frames.length - 1;
     }
@@ -52,7 +48,7 @@ export class SpriteAnimation implements IUpdateable {
 
   public update(dt: number): void {
     if (this._dt + dt >= this.timePerAllFrames) {
-      if (!this.config.isInfinite) {
+      if (!this._config.isInfinite) {
         return;
       }
 

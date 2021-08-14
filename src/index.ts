@@ -4,6 +4,7 @@ import { spriteFrames, spriteUrl } from './assets';
 
 import { IDrawable, IDrawParams } from './app/engine/drawable.interface';
 
+import { Point } from './app/engine/point';
 import { Sprite } from './app/engine/sprite';
 import { SpriteAnimation } from './app/engine/sprite-animation';
 
@@ -45,7 +46,7 @@ spriteImg.onload = () => {
     const dt = newDate.getTime() - prevDate.getTime();
 
     spriteAnimation.update(dt);
-    spriteAnimation.render({ context: drawableObj, distPoint: { x: 0, y: 0 } });
+    spriteAnimation.render({ context: drawableObj, distPoint: new Point(0, 0) });
 
     prevDate = newDate;
 

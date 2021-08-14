@@ -1,21 +1,19 @@
-import { IPoint } from './point.interface';
-import { ISize } from './size.interface';
+import { Point } from './point';
+import { Size } from './size';
 
 export interface ISpriteFrame {
-  srcPoint: IPoint;
-  srcSize: ISize;
+  readonly srcPoint: Point;
+  readonly srcSize: Size;
 }
 
 export class Sprite {
   public get frames(): ISpriteFrame[] {
-    return this._frames;
+    return this._frames.slice();
   }
 
   public set frames(value: ISpriteFrame[]) {
     this.setFrames(value);
   }
-
-  private _frames: ISpriteFrame[];
 
   public constructor(frames: ISpriteFrame[]) {
     this.setFrames(frames);
@@ -26,8 +24,10 @@ export class Sprite {
       throw new Error('Frames are not specified.');
     }
 
-    return new Sprite(frames.map((i) => ({ srcPoint: { x: i[0], y: i[1] }, srcSize: { width: i[2], height: i[3] } })));
+    return new Sprite(frames.map((i) => ({ srcPoint: new Point(i[0], i[1]), srcSize: new Size(i[2], i[3]) })));
   }
+
+  private _frames: ISpriteFrame[];
 
   private setFrames(frames: ISpriteFrame[]): void {
     if (!frames) {
@@ -38,6 +38,6 @@ export class Sprite {
       throw new Error('Sprite frames are not found.');
     }
 
-    this._frames = frames.map((frame) => ({ ...frame }));
+    this._frames = frames.slice();
   }
 }

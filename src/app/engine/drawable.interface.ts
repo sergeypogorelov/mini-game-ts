@@ -1,11 +1,11 @@
-import { IPoint } from './point.interface';
-import { ISize } from './size.interface';
+import { Point } from './point';
+import { Size } from './size';
 
 export interface IDrawParams {
-  srcPoint: IPoint;
-  srcSize: ISize;
-  distPoint: IPoint;
-  distSize: ISize;
+  srcPoint: Point;
+  srcSize: Size;
+  distPoint: Point;
+  distSize: Size;
 }
 
 export interface IDrawable {
