@@ -1,9 +1,11 @@
 import { IUpdateable } from './updateable.interface';
-import { IDrawable, IDrawParams } from './drawable.interface';
+import { IDrawable } from './drawable.interface';
 
 import { Point } from './point';
 import { Size } from './size';
 import { ISpriteFrame, Sprite } from './sprite';
+
+import { IRenderParams, Renderer } from './renderer';
 
 export interface ISpriteAnimationConfig {
   readonly sprite: Sprite;
@@ -14,9 +16,10 @@ export interface ISpriteAnimationConfig {
 
 export interface ISpriteRenderParams {
   readonly context: IDrawable;
-  readonly distPoint: Point;
+  readonly renderer: Renderer;
+  readonly destPointInUnits: Point;
 
-  readonly distSize?: Size;
+  readonly destSizeInUnits?: Size;
 }
 
 export class SpriteAnimation implements IUpdateable {
@@ -63,12 +66,18 @@ export class SpriteAnimation implements IUpdateable {
   }
 
   public render(params: ISpriteRenderParams): void {
-    const { context, distPoint, distSize } = params;
-    const { srcPoint, srcSize } = this.getCurrentFrame();
+    const { context, renderer, destPointInUnits, destSizeInUnits } = params;
+    const { srcPoint: srcPointInPixels, srcSize: srcSizeInPixels } = this.getCurrentFrame();
 
-    const drawParams: IDrawParams = { srcPoint, srcSize, distPoint, distSize: distSize ?? srcSize };
+    const renderParams: IRenderParams = {
+      context,
+      srcPointInPixels,
+      srcSizeInPixels,
+      destPointInUnits,
+      destSizeInUnits,
+    };
 
-    context.draw(drawParams);
+    renderer.render(renderParams);
   }
 
   private _dt: number;

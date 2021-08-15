@@ -1,7 +1,17 @@
+import { IDrawable, IDrawParams } from './drawable.interface';
+
 import { Point } from './point';
 import { Size } from './size';
 
-export class GameScreen {
+export interface IRenderParams {
+  context: IDrawable;
+  srcPointInPixels: Point;
+  srcSizeInPixels: Size;
+  destPointInUnits: Point;
+  destSizeInUnits: Size;
+}
+
+export class Renderer {
   public get sizeInUnits(): Size {
     return this._sizeInUnits;
   }
@@ -61,6 +71,41 @@ export class GameScreen {
     return new Size(sizeInUnits.width * xMultiplier, sizeInUnits.height * yMultiplier);
   }
 
+  public render(params: IRenderParams): void {
+    if (!params) {
+      throw new Error('Render params are not defined.');
+    }
+
+    if (!params.context) {
+      throw new Error('Context for rendering is not defined.');
+    }
+
+    if (!params.srcPointInPixels) {
+      throw new Error('Source point for rendering is not defined.');
+    }
+
+    if (!params.srcSizeInPixels) {
+      throw new Error('Source size for rendering is not defined.');
+    }
+
+    if (!params.destPointInUnits) {
+      throw new Error('Destination point for rendering is not defined.');
+    }
+
+    if (!params.destSizeInUnits) {
+      throw new Error('Destination size for rendering is not defined.');
+    }
+
+    const { context, srcPointInPixels: sp, srcSizeInPixels: ss, destPointInUnits, destSizeInUnits } = params;
+
+    const dp = this.castUnitPointToPixel(destPointInUnits);
+    const ds = this.castUnitSizeToPixel(destSizeInUnits);
+
+    const drawParams: IDrawParams = { srcPoint: sp, srcSize: ss, distPoint: dp, distSize: ds };
+
+    context.draw(drawParams);
+  }
+
   private _sizeInUnits: Size;
 
   private _sizeInPixels: Size;
@@ -108,7 +153,7 @@ export class GameScreen {
         this._yIndent = (sizeInPixels.height - adjustedHeight) / 2;
         this._xIndent = 0;
       } else {
-        throw new Error('Screen instance cannot calculate resolution for rendering.');
+        throw new Error('Renderer cannot calculate resolution for rendering.');
       }
     }
 
