@@ -7,8 +7,18 @@ export interface ISpriteFrame {
 }
 
 export class Sprite {
+  public get framesAreReversed(): boolean {
+    return this._framesAreReversed;
+  }
+
   public get frames(): ISpriteFrame[] {
-    return this._frames.slice();
+    const frames = this._frames.slice();
+
+    if (this.framesAreReversed) {
+      return frames.reverse();
+    }
+
+    return frames;
   }
 
   public set frames(value: ISpriteFrame[]) {
@@ -26,6 +36,20 @@ export class Sprite {
 
     return new Sprite(frames.map((i) => ({ srcPoint: new Point(i[0], i[1]), srcSize: new Size(i[2], i[3]) })));
   }
+
+  public setReversedOrderOfFrames(): void {
+    if (!this.framesAreReversed) {
+      this._framesAreReversed = true;
+    }
+  }
+
+  public setDefaultOrderOfFrames(): void {
+    if (this.framesAreReversed) {
+      this._framesAreReversed = false;
+    }
+  }
+
+  private _framesAreReversed: boolean;
 
   private _frames: ISpriteFrame[];
 

@@ -1,12 +1,16 @@
 /* eslint-disable-next-line */
-export const imgUrl = require('./assets/images/img.png').default;
+export const levelDemoImgUrl = require('./assets/images/level-demo.png').default;
 
 /* eslint-disable-next-line */
-export const spriteUrl = require('./assets/sprites/sprite.png').default;
+export const crystalYellowSpriteUrl = require('./assets/sprites/crystal-yellow.png').default;
 
-export const spriteFrames: number[][] = [
-  [25, 20, 100, 110],
-  [145, 20, 100, 110],
-  [15, 150, 100, 110],
-  [145, 150, 100, 110],
+export const crystalYellowSpriteFrames: number[][] = [
+  [0, 0, 32, 32],
+  [32, 0, 32, 32],
+  [64, 0, 32, 32],
+  [96, 0, 32, 32],
+  [128, 0, 32, 32],
+  [160, 0, 32, 32],
+  [192, 0, 32, 32],
+  [224, 0, 32, 32],
 ];
