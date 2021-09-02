@@ -1,6 +1,6 @@
 import './index.css';
 
-import { crystalYellowSpriteUrl, crystalYellowSpriteFrames, levelDemoImgUrl } from './assets';
+import { crystalYellowSpriteUrl, crystalYellowSpriteFrames, levelDemoImgUrl, crystalSoundUrl } from './assets';
 
 import { IDrawable, IDrawParams } from './app/engine/drawable.interface';
 
@@ -11,6 +11,9 @@ import { Renderer } from './app/engine/renderer';
 import { Sprite } from './app/engine/sprite';
 import { SpriteAnimation } from './app/engine/sprite-animation';
 
+import { IResourceLoadRequest } from './app/ui/resource-loader/resource-load-request.interface';
+import { ResourceLoader } from './app/ui/resource-loader/resource-loader';
+
 const canvasEl = document.getElementById('canvas') as HTMLCanvasElement;
 
 canvasEl.width = 700;
@@ -18,22 +21,28 @@ canvasEl.height = 400;
 
 const canvasContext = canvasEl.getContext('2d');
 
-const spriteImg = new Image();
-spriteImg.src = crystalYellowSpriteUrl;
-spriteImg.onload = () => {
-  document.body.removeChild(spriteImg);
+const loadRequest: IResourceLoadRequest = {
+  imageUrls: [levelDemoImgUrl, crystalYellowSpriteUrl],
+  audioUrls: [crystalSoundUrl],
+};
 
-  const img = new Image();
-  img.src = levelDemoImgUrl;
-  img.onload = () => {
-    document.body.removeChild(img);
+ResourceLoader.getInstance()
+  .load(loadRequest)
+  .then(({ images, sounds }) => {
+    const bgImg = images.find((i) => i.url === levelDemoImgUrl).element;
+    const crystalSprite = images.find((i) => i.url === crystalYellowSpriteUrl).element;
+    const crystalSound = sounds.find((i) => i.url === crystalSoundUrl).element;
+
+    canvasEl.onclick = () => {
+      crystalSound.play();
+    };
 
     const context: IDrawable = {
       draw(params: IDrawParams) {
         canvasContext.fillStyle = '#000';
         canvasContext.fillRect(0, 0, canvasEl.width, canvasEl.height);
 
-        canvasContext.drawImage(img, 0, 0);
+        canvasContext.drawImage(bgImg, 0, 0);
 
         const { srcPoint, srcSize, distPoint, distSize } = params;
 
@@ -42,7 +51,7 @@ spriteImg.onload = () => {
         const { x: dx, y: dy } = distPoint;
         const { width: dw, height: dh } = distSize;
 
-        canvasContext.drawImage(spriteImg, sx, sy, sw, sh, dx, dy, dw, dh);
+        canvasContext.drawImage(crystalSprite, sx, sy, sw, sh, dx, dy, dw, dh);
       },
     };
 
@@ -71,9 +80,4 @@ spriteImg.onload = () => {
     };
 
     requestAnimationFrame(() => callback());
-  };
-
-  document.body.appendChild(img);
-};
-
-document.body.appendChild(spriteImg);
+  });

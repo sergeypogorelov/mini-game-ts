@@ -14,3 +14,6 @@ export const crystalYellowSpriteFrames: number[][] = [
   [192, 0, 32, 32],
   [224, 0, 32, 32],
 ];
+
+/* eslint-disable-next-line */
+export const crystalSoundUrl = require('./assets/sounds/crystal.mp3').default;

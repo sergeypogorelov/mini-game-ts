@@ -1,11 +1,18 @@
+/* eslint-disable-next-line */
 const path = require('path');
+/* eslint-disable-next-line */
 const { merge } = require('webpack-merge');
 
+/* eslint-disable-next-line */
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+/* eslint-disable-next-line */
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
+/* eslint-disable-next-line */
 const TerserPlugin = require('terser-webpack-plugin');
+/* eslint-disable-next-line */
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+/* eslint-disable-next-line */
 const webpackConfigCommon = require('./webpack.config.common');
 
 module.exports = merge(webpackConfigCommon, {
@@ -33,7 +40,7 @@ module.exports = merge(webpackConfigCommon, {
         exclude: /node_modules/,
       },
       {
-        test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)$/,
+        test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|m4a|mp3)$/,
         use: [
           {
             loader: 'file-loader',
