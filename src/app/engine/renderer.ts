@@ -1,26 +1,27 @@
-import { IDrawable, IDrawParams } from './drawable.interface';
+import { IImageDescriptor } from './image-descriptor';
+import { IDrawParams, IGraphicContext } from './graphic-context.interface';
 
-import { Point } from './point';
-import { Size } from './size';
+import { IPoint, Point } from './point';
+import { ISize, Size } from './size';
 
 export interface IRenderParams {
-  context: IDrawable;
-  srcPointInPixels: Point;
-  srcSizeInPixels: Size;
-  destPointInUnits: Point;
-  destSizeInUnits: Size;
+  image: IImageDescriptor;
+  srcPointInPixels: IPoint;
+  srcSizeInPixels: ISize;
+  destPointInUnits: IPoint;
+  destSizeInUnits: ISize;
 }
 
 export class Renderer {
-  public get sizeInUnits(): Size {
+  public get sizeInUnits(): ISize {
     return this._sizeInUnits;
   }
 
-  public get sizeInPixels(): Size {
+  public get sizeInPixels(): ISize {
     return this._sizeInPixels;
   }
 
-  public get adjustedSizeInPixels(): Size {
+  public get adjustedSizeInPixels(): ISize {
     return this._adjustedSizeInPixels;
   }
 
@@ -40,18 +41,19 @@ export class Renderer {
     return this._yMultiplier;
   }
 
-  public constructor(sizeInUnits: Size, sizeInPixels: Size) {
+  public constructor(context: IGraphicContext, sizeInUnits: ISize) {
+    this.setContext(context);
+    this.setSizeInPixels(context.size);
     this.setSizeInUnits(sizeInUnits);
+    this.recalculate();
+  }
+
+  public changeSizeInPixels(sizeInPixels: ISize): void {
     this.setSizeInPixels(sizeInPixels);
     this.recalculate();
   }
 
-  public changeSizeInPixels(sizeInPixels: Size): void {
-    this.setSizeInPixels(sizeInPixels);
-    this.recalculate();
-  }
-
-  public castUnitPointToPixel(pointInUnits: Point): Point {
+  public castUnitPointToPixel(pointInUnits: IPoint): IPoint {
     if (!pointInUnits) {
       throw new Error('Point in units is not defined.');
     }
@@ -61,7 +63,7 @@ export class Renderer {
     return new Point(pointInUnits.x * xMultiplier + xIndent, pointInUnits.y * yMultiplier + yIndent);
   }
 
-  public castUnitSizeToPixel(sizeInUnits: Size): Size {
+  public castUnitSizeToPixel(sizeInUnits: ISize): ISize {
     if (!sizeInUnits) {
       throw new Error('Size in units is not defined.');
     }
@@ -76,41 +78,41 @@ export class Renderer {
       throw new Error('Render params are not defined.');
     }
 
-    if (!params.context) {
-      throw new Error('Context for rendering is not defined.');
+    const { image, srcPointInPixels: sp, srcSizeInPixels: ss, destPointInUnits, destSizeInUnits } = params;
+
+    if (!image) {
+      throw new Error('Image for rendering is not defined.');
     }
 
-    if (!params.srcPointInPixels) {
+    if (!sp) {
       throw new Error('Source point for rendering is not defined.');
     }
 
-    if (!params.srcSizeInPixels) {
+    if (!ss) {
       throw new Error('Source size for rendering is not defined.');
     }
 
-    if (!params.destPointInUnits) {
+    if (!destPointInUnits) {
       throw new Error('Destination point for rendering is not defined.');
     }
 
-    if (!params.destSizeInUnits) {
+    if (!destSizeInUnits) {
       throw new Error('Destination size for rendering is not defined.');
     }
-
-    const { context, srcPointInPixels: sp, srcSizeInPixels: ss, destPointInUnits, destSizeInUnits } = params;
 
     const dp = this.castUnitPointToPixel(destPointInUnits);
     const ds = this.castUnitSizeToPixel(destSizeInUnits);
 
-    const drawParams: IDrawParams = { srcPoint: sp, srcSize: ss, distPoint: dp, distSize: ds };
+    const drawParams: IDrawParams = { image, srcPoint: sp, srcSize: ss, destPoint: dp, destSize: ds };
 
-    context.draw(drawParams);
+    this._context.drawImage(drawParams);
   }
 
-  private _sizeInUnits: Size;
+  private _sizeInUnits: ISize;
 
-  private _sizeInPixels: Size;
+  private _sizeInPixels: ISize;
 
-  private _adjustedSizeInPixels: Size;
+  private _adjustedSizeInPixels: ISize;
 
   private _xIndent: number;
 
@@ -120,7 +122,17 @@ export class Renderer {
 
   private _yMultiplier: number;
 
-  private setSizeInUnits(size: Size): void {
+  private _context: IGraphicContext;
+
+  private setContext(context: IGraphicContext): void {
+    if (!context) {
+      throw new Error('Context for rendering is not defined.');
+    }
+
+    this._context = context;
+  }
+
+  private setSizeInUnits(size: ISize): void {
     if (!size) {
       throw new Error('Size in units is not defined.');
     }
@@ -128,7 +140,7 @@ export class Renderer {
     this._sizeInUnits = size;
   }
 
-  private setSizeInPixels(size: Size): void {
+  private setSizeInPixels(size: ISize): void {
     if (!size) {
       throw new Error('Size in pixels is not defined.');
     }

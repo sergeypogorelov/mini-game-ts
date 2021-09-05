@@ -2,10 +2,9 @@ import './index.css';
 
 import { crystalYellowSpriteUrl, crystalYellowSpriteFrames, levelDemoImgUrl, crystalSoundUrl } from './assets';
 
-import { IDrawable, IDrawParams } from './app/engine/drawable.interface';
-
 import { Point } from './app/engine/point';
 import { Size } from './app/engine/size';
+import { ImageDescriptor } from './app/engine/image-descriptor';
 
 import { Renderer } from './app/engine/renderer';
 import { Sprite } from './app/engine/sprite';
@@ -13,6 +12,7 @@ import { SpriteAnimation } from './app/engine/sprite-animation';
 
 import { IResourceLoadRequest } from './app/ui/resource-loader/resource-load-request.interface';
 import { ResourceLoader } from './app/ui/resource-loader/resource-loader';
+import { IDrawParams, IGraphicContext } from './app/engine/graphic-context.interface';
 
 const canvasEl = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -37,30 +37,34 @@ ResourceLoader.getInstance()
       crystalSound.play();
     };
 
-    const context: IDrawable = {
-      draw(params: IDrawParams) {
+    const context: IGraphicContext = {
+      size: new Size(canvasEl.width, canvasEl.height),
+      drawImage(params: IDrawParams) {
         canvasContext.fillStyle = '#000';
         canvasContext.fillRect(0, 0, canvasEl.width, canvasEl.height);
 
         canvasContext.drawImage(bgImg, 0, 0);
 
-        const { srcPoint, srcSize, distPoint, distSize } = params;
+        const { image, srcPoint, srcSize, destPoint, destSize } = params;
 
         const { x: sx, y: sy } = srcPoint;
         const { width: sw, height: sh } = srcSize;
-        const { x: dx, y: dy } = distPoint;
-        const { width: dw, height: dh } = distSize;
+        const { x: dx, y: dy } = destPoint;
+        const { width: dw, height: dh } = destSize;
 
-        canvasContext.drawImage(crystalSprite, sx, sy, sw, sh, dx, dy, dw, dh);
+        const imageElement = images.find((i) => i.url === image.id).element;
+        canvasContext.drawImage(imageElement, sx, sy, sw, sh, dx, dy, dw, dh);
       },
     };
 
-    const destPointInUnits = new Point(5, 0);
-    const destSizeInUnits = new Size(2, 2);
+    const renderer = new Renderer(context, new Size(20, 10));
 
-    const renderer = new Renderer(new Size(20, 10), new Size(canvasEl.width, canvasEl.height));
+    const imageDescriptor = new ImageDescriptor(crystalYellowSpriteUrl, {
+      width: crystalSprite.width,
+      height: crystalSprite.height,
+    });
 
-    const sprite = Sprite.createFromArray(crystalYellowSpriteFrames);
+    const sprite = Sprite.createFromArray(imageDescriptor, crystalYellowSpriteFrames);
     sprite.setReversedOrderOfFrames();
 
     const spriteAnimation = new SpriteAnimation({ sprite, speed: 20, isInfinite: true });
@@ -71,8 +75,11 @@ ResourceLoader.getInstance()
       const newDate = new Date();
       const dt = newDate.getTime() - prevDate.getTime();
 
+      const destPointInUnits = new Point(5, 0);
+      const destSizeInUnits = new Size(2, 2);
+
       spriteAnimation.update(dt);
-      spriteAnimation.render({ context, renderer, destPointInUnits, destSizeInUnits });
+      spriteAnimation.render({ renderer, destPointInUnits, destSizeInUnits });
 
       prevDate = newDate;
 

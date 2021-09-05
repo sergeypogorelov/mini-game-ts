@@ -1,4 +1,9 @@
-export class Size {
+export interface ISize {
+  readonly width: number;
+  readonly height: number;
+}
+
+export class Size implements ISize {
   public readonly width: number;
   public readonly height: number;
   public constructor(width: number, height: number) {

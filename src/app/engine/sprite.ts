@@ -1,9 +1,11 @@
-import { Point } from './point';
-import { Size } from './size';
+import { IPoint, Point } from './point';
+import { ISize, Size } from './size';
+
+import { IImageDescriptor } from './image-descriptor';
 
 export interface ISpriteFrame {
-  readonly srcPoint: Point;
-  readonly srcSize: Size;
+  readonly srcPoint: IPoint;
+  readonly srcSize: ISize;
 }
 
 export class Sprite {
@@ -25,16 +27,32 @@ export class Sprite {
     this.setFrames(value);
   }
 
-  public constructor(frames: ISpriteFrame[]) {
+  public get image(): IImageDescriptor {
+    return this._image;
+  }
+
+  public set image(value: IImageDescriptor) {
+    this.setImage(value);
+  }
+
+  public constructor(image: IImageDescriptor, frames: ISpriteFrame[]) {
+    this.setImage(image);
     this.setFrames(frames);
   }
 
-  public static createFromArray(frames: number[][]): Sprite {
+  public static createFromArray(image: IImageDescriptor, frames: number[][]): Sprite {
+    if (!image) {
+      throw new Error('Image is not specified.');
+    }
+
     if (!frames) {
       throw new Error('Frames are not specified.');
     }
 
-    return new Sprite(frames.map((i) => ({ srcPoint: new Point(i[0], i[1]), srcSize: new Size(i[2], i[3]) })));
+    return new Sprite(
+      image,
+      frames.map((i) => ({ srcPoint: new Point(i[0], i[1]), srcSize: new Size(i[2], i[3]) })),
+    );
   }
 
   public setReversedOrderOfFrames(): void {
@@ -53,6 +71,8 @@ export class Sprite {
 
   private _frames: ISpriteFrame[];
 
+  private _image: IImageDescriptor;
+
   private setFrames(frames: ISpriteFrame[]): void {
     if (!frames) {
       throw new Error('Sprite frames are not specified.');
@@ -63,5 +83,13 @@ export class Sprite {
     }
 
     this._frames = frames.slice();
+  }
+
+  private setImage(image: IImageDescriptor): void {
+    if (!image) {
+      throw new Error('Image is not specified.');
+    }
+
+    this._image = image;
   }
 }
