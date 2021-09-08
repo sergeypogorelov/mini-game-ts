@@ -1,11 +1,11 @@
-import { IImageDescriptor } from './image-descriptor';
+import { IImg } from './img';
 import { IDrawParams, IGraphicContext } from './graphic-context.interface';
 
 import { IPoint, Point } from './point';
 import { ISize, Size } from './size';
 
 export interface IRenderParams {
-  image: IImageDescriptor;
+  image: IImg;
   srcPointInPixels: IPoint;
   srcSizeInPixels: ISize;
   destPointInUnits: IPoint;

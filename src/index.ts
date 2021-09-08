@@ -4,15 +4,15 @@ import { crystalYellowSpriteUrl, crystalYellowSpriteFrames, levelDemoImgUrl, cry
 
 import { Point } from './app/engine/point';
 import { Size } from './app/engine/size';
-import { ImageDescriptor } from './app/engine/image-descriptor';
+import { Img } from './app/engine/img';
 
 import { Renderer } from './app/engine/renderer';
 import { Sprite } from './app/engine/sprite';
 import { SpriteAnimation } from './app/engine/sprite-animation';
 
+import { IDrawParams, IGraphicContext } from './app/engine/graphic-context.interface';
 import { IResourceLoadRequest } from './app/ui/resource-loader/resource-load-request.interface';
 import { ResourceLoader } from './app/ui/resource-loader/resource-loader';
-import { IDrawParams, IGraphicContext } from './app/engine/graphic-context.interface';
 
 const canvasEl = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -59,7 +59,7 @@ ResourceLoader.getInstance()
 
     const renderer = new Renderer(context, new Size(20, 10));
 
-    const imageDescriptor = new ImageDescriptor(crystalYellowSpriteUrl, {
+    const imageDescriptor = new Img(crystalYellowSpriteUrl, {
       width: crystalSprite.width,
       height: crystalSprite.height,
     });

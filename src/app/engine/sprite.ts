@@ -1,7 +1,7 @@
 import { IPoint, Point } from './point';
 import { ISize, Size } from './size';
 
-import { IImageDescriptor } from './image-descriptor';
+import { IImg } from './img';
 
 export interface ISpriteFrame {
   readonly srcPoint: IPoint;
@@ -27,20 +27,20 @@ export class Sprite {
     this.setFrames(value);
   }
 
-  public get image(): IImageDescriptor {
+  public get image(): IImg {
     return this._image;
   }
 
-  public set image(value: IImageDescriptor) {
+  public set image(value: IImg) {
     this.setImage(value);
   }
 
-  public constructor(image: IImageDescriptor, frames: ISpriteFrame[]) {
+  public constructor(image: IImg, frames: ISpriteFrame[]) {
     this.setImage(image);
     this.setFrames(frames);
   }
 
-  public static createFromArray(image: IImageDescriptor, frames: number[][]): Sprite {
+  public static createFromArray(image: IImg, frames: number[][]): Sprite {
     if (!image) {
       throw new Error('Image is not specified.');
     }
@@ -71,7 +71,7 @@ export class Sprite {
 
   private _frames: ISpriteFrame[];
 
-  private _image: IImageDescriptor;
+  private _image: IImg;
 
   private setFrames(frames: ISpriteFrame[]): void {
     if (!frames) {
@@ -85,7 +85,7 @@ export class Sprite {
     this._frames = frames.slice();
   }
 
-  private setImage(image: IImageDescriptor): void {
+  private setImage(image: IImg): void {
     if (!image) {
       throw new Error('Image is not specified.');
     }

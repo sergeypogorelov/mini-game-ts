@@ -4,6 +4,9 @@ import { IPoint } from './point';
 import { ISize } from './size';
 import { ISpriteFrame, Sprite } from './sprite';
 
+import { Scheduler } from './scheduler/scheduler';
+import { EveryTimeSchedule } from './scheduler/every-time-schedule';
+
 import { IRenderParams, Renderer } from './renderer';
 
 export interface ISpriteAnimationConfig {
@@ -22,6 +25,10 @@ export interface ISpriteRenderParams {
 export class SpriteAnimation implements IUpdateable {
   public static readonly defSpeed = 12;
 
+  public get isFinished(): boolean {
+    return this._isFinished;
+  }
+
   public get timePerFrame(): number {
     return 1000 / this._config.speed;
   }
@@ -30,13 +37,17 @@ export class SpriteAnimation implements IUpdateable {
     return this.timePerFrame * this._config.sprite.frames.length;
   }
 
+  public get currentFrameIndex(): number {
+    return this._currentFrameIndex;
+  }
+
   public constructor(config: ISpriteAnimationConfig) {
     this.setConfig(config);
-    this.reset();
+    this.setSchedulers();
   }
 
   public getCurrentFrame(): ISpriteFrame {
-    let index = Math.floor(this._dt / this.timePerFrame);
+    let index = this._currentFrameIndex;
 
     const { frames } = this._config.sprite;
     if (index >= frames.length) {
@@ -47,19 +58,33 @@ export class SpriteAnimation implements IUpdateable {
   }
 
   public update(dt: number): void {
-    if (this._dt + dt >= this.timePerAllFrames) {
-      if (!this._config.isInfinite) {
-        return;
-      }
-
-      this.reset();
+    if (this.isFinished) {
+      return;
     }
 
-    this._dt += dt;
+    if (this._schedulerForFrame.check(dt)) {
+      this._currentFrameIndex++;
+    }
+
+    if (this._schedulerForAllFrames.check(dt)) {
+      if (this._config.isInfinite) {
+        this.reset();
+      } else {
+        this._isFinished = true;
+      }
+
+      return;
+    }
+
+    this._schedulerForFrame.update(dt);
+    this._schedulerForAllFrames.update(dt);
   }
 
   public reset(): void {
-    this._dt = 0;
+    this._currentFrameIndex = 0;
+
+    this._schedulerForFrame.schedule.reset();
+    this._schedulerForAllFrames.schedule.reset();
   }
 
   public render(params: ISpriteRenderParams): void {
@@ -78,9 +103,15 @@ export class SpriteAnimation implements IUpdateable {
     renderer.render(renderParams);
   }
 
-  private _dt: number;
+  private _isFinished = false;
+
+  private _currentFrameIndex = 0;
 
   private _config: ISpriteAnimationConfig;
+
+  private _schedulerForFrame: Scheduler;
+
+  private _schedulerForAllFrames: Scheduler;
 
   private setConfig(cfg: ISpriteAnimationConfig): void {
     if (!cfg) {
@@ -96,5 +127,10 @@ export class SpriteAnimation implements IUpdateable {
       speed: cfg.speed ?? SpriteAnimation.defSpeed,
       isInfinite: cfg.isInfinite ?? false,
     };
+  }
+
+  private setSchedulers(): void {
+    this._schedulerForFrame = Scheduler.create(new EveryTimeSchedule(this.timePerFrame));
+    this._schedulerForAllFrames = Scheduler.create(new EveryTimeSchedule(this.timePerAllFrames));
   }
 }

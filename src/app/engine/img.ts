@@ -1,11 +1,11 @@
 import { ISize } from './size';
 
-export interface IImageDescriptor {
+export interface IImg {
   readonly id: string;
   readonly size: ISize;
 }
 
-export class ImageDescriptor {
+export class Img implements IImg {
   public readonly id: string;
 
   public readonly size: ISize;

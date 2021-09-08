@@ -1,10 +1,10 @@
 import { IPoint } from './point';
 import { ISize } from './size';
 
-import { IImageDescriptor } from './image-descriptor';
+import { IImg } from './img';
 
 export interface IDrawParams {
-  image: IImageDescriptor;
+  image: IImg;
   srcPoint: IPoint;
   srcSize: ISize;
   destPoint: IPoint;
