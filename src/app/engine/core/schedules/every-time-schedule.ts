@@ -1,6 +1,6 @@
 import { Schedule } from './schedule';
 
-export class EveryTimeSchedule extends Schedule {
+export class EveryTimeSchedule extends Schedule<number> {
   public get frequency(): number {
     return this._frequency;
   }
@@ -14,27 +14,24 @@ export class EveryTimeSchedule extends Schedule {
     this.setFrequency(frequencyInMs);
   }
 
-  public checkBeforeUpdate(dt: number): boolean {
-    const count = Math.floor((this.timePassed + dt) / this.frequency);
-    return count > this._counter;
+  public checkTick(dt: number): boolean {
+    const counter = Math.floor((this.timePassed + dt) / this.frequency);
+    return counter > this.counter;
   }
 
   public update(dt: number): void {
-    if (this.checkBeforeUpdate(dt)) {
+    const shouldEmitTick = this.checkTick(dt);
+
+    if (shouldEmitTick) {
       this._counter++;
+      this.onTickBeforeUpdate.emit(this._counter);
     }
 
     super.update(dt);
-  }
 
-  public checkAfterUpdate(): boolean {
-    const count = Math.floor(this.timePassed / this.frequency);
-    return count > this._counter;
-  }
-
-  public changeFrequency(frequencyInMs: number): void {
-    this.setFrequency(frequencyInMs);
-    this.reset();
+    if (shouldEmitTick) {
+      this.onTickAfterUpdate.emit(this._counter);
+    }
   }
 
   public reset(): void {
