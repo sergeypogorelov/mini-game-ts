@@ -1,7 +1,7 @@
-import { IPoint } from './point';
-import { ISize } from './size';
+import { IPoint } from '../point';
+import { ISize } from '../size';
 
-import { IImg } from './img';
+import { IImg } from '../img';
 
 export interface IDrawParams {
   image: IImg;
@@ -11,8 +11,6 @@ export interface IDrawParams {
   destSize: ISize;
 }
 
-export interface IGraphicContext {
-  readonly size: ISize;
-
+export interface IDrawable {
   drawImage(params: IDrawParams): void;
 }

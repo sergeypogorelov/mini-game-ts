@@ -1,11 +1,11 @@
-import { IUpdateable } from './updateable.interface';
+import { IUpdateable } from './interfaces/updateable.interface';
 
 import { IPoint } from './point';
 import { ISize } from './size';
 import { ISpriteFrame, Sprite } from './sprite';
-
-import { EveryTimeSchedule } from './core/schedules/every-time-schedule';
 import { IRenderParams, Renderer } from './renderer';
+
+import { EveryTimeSchedule } from '../schedules/every-time-schedule';
 
 export interface ISpriteAnimationConfig {
   readonly sprite: Sprite;

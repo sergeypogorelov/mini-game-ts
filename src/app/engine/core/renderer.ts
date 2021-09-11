@@ -1,8 +1,8 @@
-import { IImg } from './img';
-import { IDrawParams, IGraphicContext } from './graphic-context.interface';
+import { IDrawParams, IDrawable } from './interfaces/drawable.interface';
 
 import { IPoint, Point } from './point';
 import { ISize, Size } from './size';
+import { IImg } from './img';
 
 export interface IRenderParams {
   image: IImg;
@@ -41,9 +41,9 @@ export class Renderer {
     return this._yMultiplier;
   }
 
-  public constructor(context: IGraphicContext, sizeInUnits: ISize) {
+  public constructor(context: IDrawable, sizeInPixels: ISize, sizeInUnits: ISize) {
     this.setContext(context);
-    this.setSizeInPixels(context.size);
+    this.setSizeInPixels(sizeInPixels);
     this.setSizeInUnits(sizeInUnits);
     this.recalculate();
   }
@@ -122,9 +122,9 @@ export class Renderer {
 
   private _yMultiplier: number;
 
-  private _context: IGraphicContext;
+  private _context: IDrawable;
 
-  private setContext(context: IGraphicContext): void {
+  private setContext(context: IDrawable): void {
     if (!context) {
       throw new Error('Context for rendering is not defined.');
     }

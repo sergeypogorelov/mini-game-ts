@@ -1,5 +1,6 @@
-import { EventEmitter } from '../event-emmiter';
-import { IUpdateable } from '../../updateable.interface';
+import { IUpdateable } from '../core/interfaces/updateable.interface';
+
+import { EventEmitter } from '../core/event-emmiter';
 
 export abstract class Schedule<T> implements IUpdateable {
   public readonly onTickBeforeUpdate = new EventEmitter<T>();

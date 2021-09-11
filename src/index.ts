@@ -2,15 +2,16 @@ import './index.css';
 
 import { crystalYellowSpriteUrl, crystalYellowSpriteFrames, levelDemoImgUrl, crystalSoundUrl } from './assets';
 
-import { Point } from './app/engine/point';
-import { Size } from './app/engine/size';
-import { Img } from './app/engine/img';
+import { IDrawParams, IDrawable } from './app/engine/core/interfaces/drawable.interface';
 
-import { Renderer } from './app/engine/renderer';
-import { Sprite } from './app/engine/sprite';
-import { SpriteAnimation } from './app/engine/sprite-animation';
+import { Point } from './app/engine/core/point';
+import { Size } from './app/engine/core/size';
+import { Img } from './app/engine/core/img';
 
-import { IDrawParams, IGraphicContext } from './app/engine/graphic-context.interface';
+import { Renderer } from './app/engine/core/renderer';
+import { Sprite } from './app/engine/core/sprite';
+import { SpriteAnimation } from './app/engine/core/sprite-animation';
+
 import { IResourceLoadRequest } from './app/ui/resource-loader/resource-load-request.interface';
 import { ResourceLoader } from './app/ui/resource-loader/resource-loader';
 
@@ -37,8 +38,7 @@ ResourceLoader.getInstance()
       crystalSound.play();
     };
 
-    const context: IGraphicContext = {
-      size: new Size(canvasEl.width, canvasEl.height),
+    const context: IDrawable = {
       drawImage(params: IDrawParams) {
         canvasContext.fillStyle = '#000';
         canvasContext.fillRect(0, 0, canvasEl.width, canvasEl.height);
@@ -57,7 +57,7 @@ ResourceLoader.getInstance()
       },
     };
 
-    const renderer = new Renderer(context, new Size(20, 10));
+    const renderer = new Renderer(context, new Size(canvasEl.width, canvasEl.height), new Size(20, 10));
 
     const imageDescriptor = new Img(crystalYellowSpriteUrl, {
       width: crystalSprite.width,
