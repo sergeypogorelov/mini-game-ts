@@ -7,22 +7,22 @@ import { ISize } from '../core/size';
 import { Renderer } from '../core/renderer';
 
 export abstract class Entity implements IUpdateable, IRenderable {
-  public constructor(loc: IPoint, size: ISize) {
-    this.setLocation(loc);
+  public get location(): IPoint {
+    return this._location;
+  }
+
+  public get size(): ISize {
+    return this._size;
+  }
+
+  public constructor(location: IPoint, size: ISize) {
+    this.setLocation(location);
     this.setSize(size);
   }
 
   public abstract update(dt: number): void;
 
   public abstract render(renderer: Renderer): void;
-
-  protected get location(): IPoint {
-    return this._location;
-  }
-
-  protected get size(): ISize {
-    return this._size;
-  }
 
   protected setLocation(location: IPoint): void {
     if (!location) {

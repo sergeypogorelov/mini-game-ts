@@ -1,16 +1,15 @@
 import './index.css';
 
-import { crystalYellowSpriteUrl, crystalYellowSpriteFrames, levelDemoImgUrl, crystalSoundUrl } from './assets';
+import { crystalYellowSpriteUrl, levelDemoImgUrl, crystalSoundUrl } from './assets';
 
 import { IDrawParams, IDrawable } from './app/engine/core/interfaces/drawable.interface';
 
 import { Point } from './app/engine/core/point';
 import { Size } from './app/engine/core/size';
 import { Img } from './app/engine/core/img';
-
 import { Renderer } from './app/engine/core/renderer';
-import { Sprite } from './app/engine/core/sprite';
-import { SpriteAnimation } from './app/engine/core/sprite-animation';
+
+import { Crystal } from './app/game/crystal';
 
 import { IResourceLoadRequest } from './app/ui/resource-loader/resource-load-request.interface';
 import { ResourceLoader } from './app/ui/resource-loader/resource-loader';
@@ -59,15 +58,12 @@ ResourceLoader.getInstance()
 
     const renderer = new Renderer(context, new Size(canvasEl.width, canvasEl.height), new Size(20, 10));
 
-    const imageDescriptor = new Img(crystalYellowSpriteUrl, {
+    const crystalSpriteImg = new Img(crystalYellowSpriteUrl, {
       width: crystalSprite.width,
       height: crystalSprite.height,
     });
 
-    const sprite = Sprite.createFromArray(imageDescriptor, crystalYellowSpriteFrames);
-    sprite.setReversedOrderOfFrames();
-
-    const spriteAnimation = new SpriteAnimation({ sprite, speed: 20, isInfinite: true });
+    const crystal = new Crystal(crystalSpriteImg, new Point(5, 0), new Size(2, 2));
 
     let prevDate = new Date();
 
@@ -75,11 +71,8 @@ ResourceLoader.getInstance()
       const newDate = new Date();
       const dt = newDate.getTime() - prevDate.getTime();
 
-      const destPointInUnits = new Point(5, 0);
-      const destSizeInUnits = new Size(2, 2);
-
-      spriteAnimation.update(dt);
-      spriteAnimation.render({ renderer, destPointInUnits, destSizeInUnits });
+      crystal.update(dt);
+      crystal.render(renderer);
 
       prevDate = newDate;
 
