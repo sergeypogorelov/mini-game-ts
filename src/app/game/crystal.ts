@@ -1,18 +1,20 @@
 import { crystalYellowSpriteFrames } from '../../assets';
 
-import { Img } from '../engine/core/img';
 import { IPoint } from '../engine/core/point';
-import { Renderer } from '../engine/core/renderer';
 import { ISize } from '../engine/core/size';
+import { IImg } from '../engine/core/img';
+
 import { Sprite } from '../engine/core/sprite';
+import { SpriteAnimation } from '../engine/core/sprite-animation';
+
+import { Renderer } from '../engine/core/renderer';
 
 import { Entity } from '../engine/entities/entity';
-import { SpriteAnimation } from '../engine/entities/sprite-animation';
 
 export class Crystal extends Entity {
   public static readonly animationSpeed = 20;
 
-  public constructor(spriteImg: Img, location: IPoint, size: ISize) {
+  public constructor(spriteImg: IImg, location: IPoint, size: ISize) {
     super(location, size);
 
     this.setSpriteAnimation(spriteImg);
@@ -23,24 +25,13 @@ export class Crystal extends Entity {
   }
 
   public render(renderer: Renderer): void {
-    this._spriteAnimation.render(renderer);
-  }
-
-  protected setLocation(location: IPoint): void {
-    super.setLocation(location);
-
-    this._spriteAnimation?.changeLocation(location);
-  }
-
-  protected setSize(size: ISize): void {
-    super.setSize(size);
-
-    this._spriteAnimation?.changeSize(size);
+    const { location, size } = this;
+    this._spriteAnimation.render(renderer, location, size);
   }
 
   private _spriteAnimation: SpriteAnimation;
 
-  private setSpriteAnimation(spriteImg: Img): void {
+  private setSpriteAnimation(spriteImg: IImg): void {
     if (!spriteImg) {
       throw new Error('Crystal sprite image is not specified.');
     }
@@ -49,8 +40,6 @@ export class Crystal extends Entity {
 
     this._spriteAnimation = new SpriteAnimation({
       sprite,
-      locationInUnits: this.location,
-      sizeInUnits: this.size,
       speed: Crystal.animationSpeed,
       isInfinite: true,
     });

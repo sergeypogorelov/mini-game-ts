@@ -1,22 +1,21 @@
-import { IPoint } from '../core/point';
-import { ISize } from '../core/size';
-import { ISpriteFrame, Sprite } from '../core/sprite';
-import { IRenderParams, Renderer } from '../core/renderer';
+import { IUpdateable } from './interfaces/updateable.interface';
+
+import { IPoint } from './point';
+import { ISize } from './size';
+
+import { ISpriteFrame, Sprite } from './sprite';
+import { IRenderParams, Renderer } from './renderer';
 
 import { EveryTimeSchedule } from '../schedules/every-time-schedule';
 
-import { Entity } from './entity';
-
 export interface ISpriteAnimationConfig {
-  readonly locationInUnits: IPoint;
-  readonly sizeInUnits: ISize;
   readonly sprite: Sprite;
 
   readonly isInfinite?: boolean;
   readonly speed?: number;
 }
 
-export class SpriteAnimation extends Entity {
+export class SpriteAnimation implements IUpdateable {
   public static readonly defSpeed = 12;
 
   public get timePerFrame(): number {
@@ -28,8 +27,6 @@ export class SpriteAnimation extends Entity {
   }
 
   public constructor(config: ISpriteAnimationConfig) {
-    super(config.locationInUnits, config.sizeInUnits);
-
     this.setConfig(config);
     this.setSchedules();
   }
@@ -60,8 +57,7 @@ export class SpriteAnimation extends Entity {
     this._allFramesSchedule.update(dt);
   }
 
-  public render(renderer: Renderer): void {
-    const { location: destPointInUnits, size: destSizeInUnits } = this;
+  public render(renderer: Renderer, destPointInUnits: IPoint, destSizeInUnits: ISize): void {
     const { srcPoint: srcPointInPixels, srcSize: srcSizeInPixels } = this.getCurrentFrame();
     const { image } = this._config.sprite;
 
@@ -81,14 +77,6 @@ export class SpriteAnimation extends Entity {
 
     this._singleFrameSchedule.reset();
     this._allFramesSchedule.reset();
-  }
-
-  public changeLocation(location: IPoint): void {
-    this.setLocation(location);
-  }
-
-  public changeSize(size: ISize): void {
-    this.setSize(size);
   }
 
   private _isFinished = false;
@@ -113,8 +101,6 @@ export class SpriteAnimation extends Entity {
     }
 
     this._config = {
-      locationInUnits: cfg.locationInUnits,
-      sizeInUnits: cfg.sizeInUnits,
       sprite: cfg.sprite,
       speed: cfg.speed ?? SpriteAnimation.defSpeed,
       isInfinite: cfg.isInfinite ?? false,
