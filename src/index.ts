@@ -1,18 +1,14 @@
 import './index.css';
 
-import { crystalYellowSpriteUrl, levelDemoImgUrl, crystalSoundUrl } from './assets';
-
 import { IDrawParams, IDrawable } from './app/engine/core/interfaces/drawable.interface';
+import { ISize, Size } from './app/engine/core/size';
+import { EventEmitter } from './app/engine/core/event-emmiter';
 
-import { Point } from './app/engine/core/point';
-import { Size } from './app/engine/core/size';
-import { Img } from './app/engine/core/img';
-import { Renderer } from './app/engine/core/renderer';
+import { IEngineConfig } from './app/engine/engine';
+import { Game } from './app/game/game';
+import { DemoLevel } from './app/game/demo-level';
 
-import { Crystal } from './app/game/crystal';
-
-import { IResourceLoadRequest } from './app/ui/resource-loader/resource-load-request.interface';
-import { ResourceLoader } from './app/ui/resource-loader/resource-loader';
+import { WebDemoAssetsManager } from './app/ui/web-demo-assets-manager';
 
 const canvasEl = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -21,63 +17,51 @@ canvasEl.height = 400;
 
 const canvasContext = canvasEl.getContext('2d');
 
-const loadRequest: IResourceLoadRequest = {
-  imageUrls: [levelDemoImgUrl, crystalYellowSpriteUrl],
-  audioUrls: [crystalSoundUrl],
+const assetsManager = new WebDemoAssetsManager();
+
+const graphicContext: IDrawable = {
+  drawImage(params: IDrawParams) {
+    const { image, srcPoint, srcSize, destPoint, destSize } = params;
+
+    const { x: sx, y: sy } = srcPoint;
+    const { width: sw, height: sh } = srcSize;
+    const { x: dx, y: dy } = destPoint;
+    const { width: dw, height: dh } = destSize;
+
+    const imageElement = assetsManager.getImageElement(image.id);
+    canvasContext.drawImage(imageElement, sx, sy, sw, sh, dx, dy, dw, dh);
+  },
 };
 
-ResourceLoader.getInstance()
-  .load(loadRequest)
-  .then(({ images, sounds }) => {
-    const bgImg = images.find((i) => i.url === levelDemoImgUrl).element;
-    const crystalSprite = images.find((i) => i.url === crystalYellowSpriteUrl).element;
-    const crystalSound = sounds.find((i) => i.url === crystalSoundUrl).element;
+const cfg: IEngineConfig = {
+  graphicContext,
+  animator: {
+    onBeforeRepaint: new EventEmitter<number>(),
+  },
+  resolutionObserver: {
+    initialValue: new Size(canvasEl.width, canvasEl.height),
+    onChange: new EventEmitter<ISize>(),
+  },
+};
 
-    canvasEl.onclick = () => {
-      crystalSound.play();
-    };
+const game = new Game(cfg);
+game.changeCurrentLevel(new DemoLevel(assetsManager));
+game.currentLevel.load().then(() => {
+  game.setUpdatingStatus(true);
+  game.setRenderingStatus(true);
+});
 
-    const context: IDrawable = {
-      drawImage(params: IDrawParams) {
-        canvasContext.fillStyle = '#000';
-        canvasContext.fillRect(0, 0, canvasEl.width, canvasEl.height);
+let prevDate = new Date();
 
-        canvasContext.drawImage(bgImg, 0, 0);
+const callback = () => {
+  const newDate = new Date();
+  const dt = newDate.getTime() - prevDate.getTime();
 
-        const { image, srcPoint, srcSize, destPoint, destSize } = params;
+  cfg.animator.onBeforeRepaint.emit(dt);
 
-        const { x: sx, y: sy } = srcPoint;
-        const { width: sw, height: sh } = srcSize;
-        const { x: dx, y: dy } = destPoint;
-        const { width: dw, height: dh } = destSize;
+  prevDate = newDate;
 
-        const imageElement = images.find((i) => i.url === image.id).element;
-        canvasContext.drawImage(imageElement, sx, sy, sw, sh, dx, dy, dw, dh);
-      },
-    };
+  requestAnimationFrame(() => callback());
+};
 
-    const renderer = new Renderer(context, new Size(canvasEl.width, canvasEl.height), new Size(20, 10));
-
-    const crystalSpriteImg = new Img(crystalYellowSpriteUrl, {
-      width: crystalSprite.width,
-      height: crystalSprite.height,
-    });
-
-    const crystal = new Crystal(crystalSpriteImg, new Point(5, 0), new Size(2, 2));
-
-    let prevDate = new Date();
-
-    const callback = () => {
-      const newDate = new Date();
-      const dt = newDate.getTime() - prevDate.getTime();
-
-      crystal.update(dt);
-      crystal.render(renderer);
-
-      prevDate = newDate;
-
-      requestAnimationFrame(() => callback());
-    };
-
-    requestAnimationFrame(() => callback());
-  });
+requestAnimationFrame(() => callback());

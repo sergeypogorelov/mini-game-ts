@@ -53,6 +53,11 @@ export class Renderer {
     this.recalculate();
   }
 
+  public changeSizeInUnits(sizeInUnits: ISize): void {
+    this.setSizeInUnits(sizeInUnits);
+    this.recalculate();
+  }
+
   public castUnitPointToPixel(pointInUnits: IPoint): IPoint {
     if (!pointInUnits) {
       throw new Error('Point in units is not defined.');
