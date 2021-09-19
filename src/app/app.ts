@@ -21,20 +21,29 @@ export class App {
     this.setRootElement(rootElement);
   }
 
-  public run(): void {
+  public async run(): Promise<void> {
     if (this._isRunning) {
       throw new Error('The app is already running.');
     }
 
     this._isRunning = true;
 
-    const assetsManager = new WebAssetsManager();
-    const animator = new WebAnimator();
     const resolutionAdapter = new WebResolutionAdapter();
 
     const currentResolution = resolutionAdapter.currentResolution;
     const canvasEl = this.createCanvasEl(currentResolution.width, currentResolution.height);
 
+    resolutionAdapter.onChange.attach(() => {
+      const { width, height } = resolutionAdapter.currentResolution;
+
+      canvasEl.width = width;
+      canvasEl.height = height;
+    });
+
+    resolutionAdapter.startWatching();
+
+    const animator = new WebAnimator();
+    const assetsManager = new WebAssetsManager();
     const graphicContext = new WebGraphicContext(canvasEl, assetsManager);
 
     const engineCfg: IEngineConfig = {
@@ -45,22 +54,15 @@ export class App {
 
     const game = new Game(engineCfg);
     game.changeCurrentLevel(new DemoLevel(assetsManager));
-    game.currentLevel.load().then(() => {
-      this.rootEl.appendChild(canvasEl);
 
-      game.setUpdatingStatus(true);
-      game.setRenderingStatus(true);
-    });
+    await game.currentLevel.load();
 
-    resolutionAdapter.onChange.attach(() => {
-      const { width, height } = resolutionAdapter.currentResolution;
+    this.rootEl.appendChild(canvasEl);
 
-      canvasEl.width = width;
-      canvasEl.height = height;
-    });
-
-    resolutionAdapter.startWatching();
     animator.startAnimating();
+
+    game.setUpdatingStatus(true);
+    game.setRenderingStatus(true);
   }
 
   private _isRunning: boolean;
