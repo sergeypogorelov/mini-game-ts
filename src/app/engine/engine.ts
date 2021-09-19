@@ -1,6 +1,7 @@
+import { IAnimator } from './core/interfaces/animator.interface';
 import { IDrawable } from './core/interfaces/drawable.interface';
+import { IResolutionAdapter } from './core/interfaces/resolution-adapter.interface';
 
-import { ISize } from './core/size';
 import { EventEmitter } from './core/event-emmiter';
 import { Renderer } from './core/renderer';
 
@@ -8,13 +9,8 @@ import { Level } from './level';
 
 export interface IEngineConfig {
   readonly graphicContext: IDrawable;
-  readonly resolutionObserver: {
-    readonly currentResolution: ISize;
-    readonly onChange: EventEmitter<ISize>;
-  };
-  readonly animator: {
-    readonly onBeforeRepaint: EventEmitter<number>;
-  };
+  readonly resolutionAdapter: IResolutionAdapter;
+  readonly animator: IAnimator;
 }
 
 export abstract class Engine {
@@ -79,13 +75,13 @@ export abstract class Engine {
     } else {
       const renderer = new Renderer(
         this.engineConfig.graphicContext,
-        this.engineConfig.resolutionObserver.currentResolution,
+        this.engineConfig.resolutionAdapter.currentResolution,
         level.size,
       );
 
       this.setRenderer(renderer);
 
-      this.engineConfig.resolutionObserver.onChange.attach((newSizeInPixels) => {
+      this.engineConfig.resolutionAdapter.onChange.attach((newSizeInPixels) => {
         this.renderer.changeSizeInPixels(newSizeInPixels);
       });
     }

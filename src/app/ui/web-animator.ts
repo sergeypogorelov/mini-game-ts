@@ -1,6 +1,7 @@
+import { IAnimator } from '../engine/core/interfaces/animator.interface';
 import { EventEmitter } from '../engine/core/event-emmiter';
 
-export class WebAnimator {
+export class WebAnimator implements IAnimator {
   public readonly onBeforeRepaint: EventEmitter<number>;
 
   public get isRunning(): boolean {

@@ -1,7 +1,9 @@
+import { IResolutionAdapter } from '../engine/core/interfaces/resolution-adapter.interface';
+
 import { ISize, Size } from '../engine/core/size';
 import { EventEmitter } from '../engine/core/event-emmiter';
 
-export class WebResolutionObserver {
+export class WebResolutionAdapter implements IResolutionAdapter {
   public static readonly defDelay = 20;
 
   public static readonly indent = 2;
@@ -21,23 +23,23 @@ export class WebResolutionObserver {
   }
 
   public get currentResolution(): ISize {
-    const indent = WebResolutionObserver.indent;
+    const indent = WebResolutionAdapter.indent;
 
     let width = window.innerWidth - indent;
     let height = window.innerHeight - indent;
 
-    if (width < WebResolutionObserver.minWidth) {
-      width = WebResolutionObserver.minWidth;
+    if (width < WebResolutionAdapter.minWidth) {
+      width = WebResolutionAdapter.minWidth;
     }
 
-    if (height < WebResolutionObserver.minHeight) {
-      height = WebResolutionObserver.minHeight;
+    if (height < WebResolutionAdapter.minHeight) {
+      height = WebResolutionAdapter.minHeight;
     }
 
     return new Size(width, height);
   }
 
-  public constructor(delay = WebResolutionObserver.defDelay) {
+  public constructor(delay = WebResolutionAdapter.defDelay) {
     this.setDelay(delay);
 
     this.onChange = new EventEmitter<ISize>();

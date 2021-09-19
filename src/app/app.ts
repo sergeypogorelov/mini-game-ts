@@ -1,11 +1,12 @@
 import { IEngineConfig } from './engine/engine';
+
 import { DemoLevel } from './game/demo-level';
 import { Game } from './game/game';
 
 import { WebAnimator } from './ui/web-animator';
 import { WebAssetsManager } from './ui/web-assets-manager';
 import { WebGraphicContext } from './ui/web-graphic-context';
-import { WebResolutionObserver } from './ui/web-resolution-observer';
+import { WebResolutionAdapter } from './ui/web-resolution-adapter';
 
 export class App {
   public get isRunning(): boolean {
@@ -29,9 +30,9 @@ export class App {
 
     const assetsManager = new WebAssetsManager();
     const animator = new WebAnimator();
-    const resolutionObserver = new WebResolutionObserver();
+    const resolutionAdapter = new WebResolutionAdapter();
 
-    const currentResolution = resolutionObserver.currentResolution;
+    const currentResolution = resolutionAdapter.currentResolution;
     const canvasEl = this.createCanvasEl(currentResolution.width, currentResolution.height);
 
     const graphicContext = new WebGraphicContext(canvasEl, assetsManager);
@@ -39,7 +40,7 @@ export class App {
     const engineCfg: IEngineConfig = {
       graphicContext,
       animator,
-      resolutionObserver,
+      resolutionAdapter,
     };
 
     const game = new Game(engineCfg);
@@ -51,14 +52,14 @@ export class App {
       game.setRenderingStatus(true);
     });
 
-    resolutionObserver.onChange.attach(() => {
-      const { width, height } = resolutionObserver.currentResolution;
+    resolutionAdapter.onChange.attach(() => {
+      const { width, height } = resolutionAdapter.currentResolution;
 
       canvasEl.width = width;
       canvasEl.height = height;
     });
 
-    resolutionObserver.startWatching();
+    resolutionAdapter.startWatching();
     animator.startAnimating();
   }
 
