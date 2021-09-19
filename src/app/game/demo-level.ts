@@ -1,10 +1,13 @@
 import { crystalYellowSpriteUrl, levelDemoImgUrl } from '../../assets';
-import { AssetsManager } from '../engine/assets-manager';
-import { IImg } from '../engine/core/img';
+
 import { Point } from '../engine/core/point';
-import { IRenderParams, Renderer } from '../engine/core/renderer';
+import { IImg } from '../engine/core/img';
 import { Size } from '../engine/core/size';
+
+import { IRenderParams, Renderer } from '../engine/core/renderer';
+import { AssetsManager } from '../engine/assets-manager';
 import { Level } from '../engine/level';
+
 import { Crystal } from './crystal';
 
 export class DemoLevel extends Level {
@@ -17,18 +20,13 @@ export class DemoLevel extends Level {
   }
 
   public render(renderer: Renderer): void {
-    const params: IRenderParams = {
-      image: this._backgroundImg,
-      srcPointInPixels: new Point(0, 0),
-      srcSizeInPixels: this._backgroundImg.size,
-      destPointInUnits: new Point(0, 0),
-      destSizeInUnits: this.size,
-    };
+    renderer.clearContext();
 
-    renderer.render(params);
-
-    this._crystal.render(renderer);
+    this.renderBackground(renderer);
+    this.renderEntities(renderer);
   }
+
+  protected imageIds: string[] = [levelDemoImgUrl, crystalYellowSpriteUrl];
 
   protected loadEntities(): Promise<void> {
     this._backgroundImg = this.assetsManager.getImage(levelDemoImgUrl);
@@ -42,4 +40,28 @@ export class DemoLevel extends Level {
   private _crystal: Crystal;
 
   private _backgroundImg: IImg;
+
+  private renderBackground(renderer: Renderer): void {
+    if (!renderer) {
+      throw new Error('Renderer is not specified.');
+    }
+
+    const params: IRenderParams = {
+      image: this._backgroundImg,
+      srcPointInPixels: new Point(0, 0),
+      srcSizeInPixels: this._backgroundImg.size,
+      destPointInUnits: new Point(0, 0),
+      destSizeInUnits: this.size,
+    };
+
+    renderer.render(params);
+  }
+
+  private renderEntities(renderer: Renderer): void {
+    if (!renderer) {
+      throw new Error('Renderer is not specified.');
+    }
+
+    this._crystal.render(renderer);
+  }
 }

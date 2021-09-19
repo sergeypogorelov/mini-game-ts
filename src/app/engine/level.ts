@@ -34,13 +34,15 @@ export abstract class Level implements IUpdateable, IRenderable {
   public async load(): Promise<Level> {
     this._isLoaded = false;
 
-    await this.assetsManager.load();
+    await this.assetsManager.load(this.imageIds);
     await this.loadEntities();
 
     this._isLoaded = true;
 
     return this;
   }
+
+  protected abstract imageIds: string[];
 
   protected abstract loadEntities(): Promise<void>;
 

@@ -1,19 +1,21 @@
 import { IImg } from './core/img';
 
 export abstract class AssetsManager {
-  public abstract get isLoaded(): boolean;
+  public abstract get isLoading(): boolean;
 
   public constructor() {
     this.imageStoreMap = new Map<string, IImg>();
   }
 
-  public abstract load(): Promise<void>;
-
   public getImage(id: string): IImg {
     return this.imageStoreMap.get(id);
   }
 
-  protected abstract imageIds: string[];
+  public abstract load(imageIds: string[]): Promise<void>;
 
-  protected imageStoreMap: Map<string, IImg>;
+  public clear(): void {
+    this.imageStoreMap.clear();
+  }
+
+  protected readonly imageStoreMap: Map<string, IImg>;
 }

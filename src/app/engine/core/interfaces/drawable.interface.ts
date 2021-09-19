@@ -12,5 +12,6 @@ export interface IDrawParams {
 }
 
 export interface IDrawable {
+  clear(): void;
   drawImage(params: IDrawParams): void;
 }

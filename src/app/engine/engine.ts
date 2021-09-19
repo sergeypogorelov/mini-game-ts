@@ -60,6 +60,18 @@ export abstract class Engine {
       throw new Error('Level is not specified.');
     }
 
+    if (this.isUpdatingEnabled) {
+      throw new Error('Cannot change level as updating is enabled.');
+    }
+
+    if (this.isRenderingEnabled) {
+      throw new Error('Cannot change level as rendering is enabled.');
+    }
+
+    if (this._currentLevel) {
+      this._currentLevel.assetsManager.clear();
+    }
+
     this._currentLevel = level;
 
     if (this.renderer) {

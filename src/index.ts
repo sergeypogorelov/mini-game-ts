@@ -8,7 +8,7 @@ import { IEngineConfig } from './app/engine/engine';
 import { Game } from './app/game/game';
 import { DemoLevel } from './app/game/demo-level';
 
-import { WebDemoAssetsManager } from './app/ui/web-demo-assets-manager';
+import { WebAssetsManager } from './app/ui/web-assets-manager';
 
 const canvasEl = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -17,9 +17,13 @@ canvasEl.height = 400;
 
 const canvasContext = canvasEl.getContext('2d');
 
-const assetsManager = new WebDemoAssetsManager();
+const assetsManager = new WebAssetsManager();
 
 const graphicContext: IDrawable = {
+  clear() {
+    canvasContext.fillStyle = '#000';
+    canvasContext.fillRect(0, 0, canvasEl.width, canvasEl.height);
+  },
   drawImage(params: IDrawParams) {
     const { image, srcPoint, srcSize, destPoint, destSize } = params;
 

@@ -78,6 +78,10 @@ export class Renderer {
     return new Size(sizeInUnits.width * xMultiplier, sizeInUnits.height * yMultiplier);
   }
 
+  public clearContext(): void {
+    this._context.clear();
+  }
+
   public render(params: IRenderParams): void {
     if (!params) {
       throw new Error('Render params are not defined.');
