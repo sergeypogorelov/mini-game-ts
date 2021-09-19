@@ -9,7 +9,7 @@ import { Level } from './level';
 export interface IEngineConfig {
   readonly graphicContext: IDrawable;
   readonly resolutionObserver: {
-    readonly initialValue: ISize;
+    readonly currentResolution: ISize;
     readonly onChange: EventEmitter<ISize>;
   };
   readonly animator: {
@@ -79,7 +79,7 @@ export abstract class Engine {
     } else {
       const renderer = new Renderer(
         this.engineConfig.graphicContext,
-        this.engineConfig.resolutionObserver.initialValue,
+        this.engineConfig.resolutionObserver.currentResolution,
         level.size,
       );
 
