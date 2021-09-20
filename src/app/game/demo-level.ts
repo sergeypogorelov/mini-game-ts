@@ -1,19 +1,30 @@
-import { crystalYellowSpriteUrl, levelDemoImgUrl } from '../../assets';
+import {
+  crystalBlueSpriteFrames,
+  crystalBlueSpriteUrl,
+  crystalGreenSpriteFrames,
+  crystalGreenSpriteUrl,
+  crystalGreySpriteFrames,
+  crystalGreySpriteUrl,
+  crystalRedSpriteFrames,
+  crystalRedSpriteUrl,
+  levelDemoImgUrl,
+} from '../../assets';
 
 import { IPoint, Point } from '../engine/core/point';
 import { IImg } from '../engine/core/img';
 import { Size } from '../engine/core/size';
 
 import { IRenderParams, Renderer } from '../engine/core/renderer';
+import { Utils } from '../engine/core/utils';
+
 import { AssetsManager } from '../engine/assets-manager';
 import { Level } from '../engine/level';
 
-import { Crystal } from './crystal';
-import { Utils } from '../engine/core/utils';
+import { Crystal, CrystalColor } from './entities/crystal';
 
 export class DemoLevel extends Level {
   public constructor(assetsManager: AssetsManager) {
-    super(assetsManager, new Size(700, 400));
+    super(assetsManager, new Size(70, 40));
   }
 
   public update(dt: number): void {
@@ -37,13 +48,17 @@ export class DemoLevel extends Level {
     }
   }
 
-  protected imageIds: string[] = [levelDemoImgUrl, crystalYellowSpriteUrl];
+  protected imageIds: string[] = [
+    levelDemoImgUrl,
+    crystalRedSpriteUrl,
+    crystalGreenSpriteUrl,
+    crystalBlueSpriteUrl,
+    crystalGreySpriteUrl,
+  ];
 
   protected loadEntities(): Promise<void> {
     this._backgroundImg = this.assetsManager.getImage(levelDemoImgUrl);
-
-    const img = this.assetsManager.getImage(crystalYellowSpriteUrl);
-    this._crystal = new Crystal(img, new Point(0, 0), new Size(32, 32));
+    this._crystal = this.createCrystal(new Point(0, 0), CrystalColor.Blue);
 
     return Promise.resolve();
   }
@@ -74,5 +89,39 @@ export class DemoLevel extends Level {
     }
 
     this._crystal.render(renderer);
+  }
+
+  private createCrystal(location: IPoint, color: CrystalColor): Crystal {
+    if (!location) {
+      throw new Error('Crystal location is not specified.');
+    }
+
+    if (!color) {
+      throw new Error('Crystal color is not specified.');
+    }
+
+    const spriteUrlPerColorMap = new Map<CrystalColor, string>([
+      [CrystalColor.Grey, crystalGreySpriteUrl],
+      [CrystalColor.Red, crystalRedSpriteUrl],
+      [CrystalColor.Green, crystalGreenSpriteUrl],
+      [CrystalColor.Blue, crystalBlueSpriteUrl],
+    ]);
+
+    const spriteFramesPerColorMap = new Map<CrystalColor, number[][]>([
+      [CrystalColor.Grey, crystalGreySpriteFrames],
+      [CrystalColor.Red, crystalRedSpriteFrames],
+      [CrystalColor.Green, crystalGreenSpriteFrames],
+      [CrystalColor.Blue, crystalBlueSpriteFrames],
+    ]);
+
+    const spriteImage = this.assetsManager.getImage(spriteUrlPerColorMap.get(color));
+    const spriteFrames = spriteFramesPerColorMap.get(color);
+
+    return new Crystal({
+      spriteImage,
+      spriteFrames,
+      color,
+      location,
+    });
   }
 }
