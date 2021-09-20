@@ -1,8 +1,21 @@
-import { IImg } from '../../engine/core/img';
+import {
+  crystalBlueSpriteFrames,
+  crystalBlueSpriteUrl,
+  crystalGreenSpriteFrames,
+  crystalGreenSpriteUrl,
+  crystalGreySpriteFrames,
+  crystalGreySpriteUrl,
+  crystalRedSpriteFrames,
+  crystalRedSpriteUrl,
+} from '../../../assets';
+
 import { IPoint } from '../../engine/core/point';
-import { Renderer } from '../../engine/core/renderer';
+import { IImg } from '../../engine/core/img';
+
 import { Sprite } from '../../engine/core/sprite';
 import { SpriteAnimation } from '../../engine/core/sprite-animation';
+
+import { Renderer } from '../../engine/core/renderer';
 
 import { GameEntity, GameEntityTypes } from './game-entity';
 
@@ -21,6 +34,27 @@ export interface ICrystalParams {
 }
 
 export class Crystal extends GameEntity {
+  public static readonly spriteUrlPerColorMap = new Map<CrystalColor, string>([
+    [CrystalColor.Grey, crystalGreySpriteUrl],
+    [CrystalColor.Red, crystalRedSpriteUrl],
+    [CrystalColor.Green, crystalGreenSpriteUrl],
+    [CrystalColor.Blue, crystalBlueSpriteUrl],
+  ]);
+
+  public static readonly spriteFramesPerColorMap = new Map<CrystalColor, number[][]>([
+    [CrystalColor.Grey, crystalGreySpriteFrames],
+    [CrystalColor.Red, crystalRedSpriteFrames],
+    [CrystalColor.Green, crystalGreenSpriteFrames],
+    [CrystalColor.Blue, crystalBlueSpriteFrames],
+  ]);
+
+  public static readonly animationSpeedByColorMap = new Map<CrystalColor, number>([
+    [CrystalColor.Grey, 0],
+    [CrystalColor.Red, 24],
+    [CrystalColor.Green, 18],
+    [CrystalColor.Blue, 22],
+  ]);
+
   public get color(): CrystalColor {
     return this._color;
   }
@@ -28,13 +62,6 @@ export class Crystal extends GameEntity {
   public get spriteAnimation(): SpriteAnimation {
     return this._spriteAnimation;
   }
-
-  public readonly animationSpeedByColorMap = new Map<CrystalColor, number>([
-    [CrystalColor.Grey, 0],
-    [CrystalColor.Red, 28],
-    [CrystalColor.Green, 18],
-    [CrystalColor.Blue, 24],
-  ]);
 
   public constructor(params: ICrystalParams) {
     super(GameEntityTypes.Crystal, params?.location, Crystal.defSize);
@@ -102,7 +129,7 @@ export class Crystal extends GameEntity {
     }
 
     const sprite = Sprite.createFromArray(spriteImage, spriteFrames);
-    const speed = this.animationSpeedByColorMap.get(this.color);
+    const speed = Crystal.animationSpeedByColorMap.get(this.color);
 
     this._spriteAnimation = new SpriteAnimation({
       sprite,

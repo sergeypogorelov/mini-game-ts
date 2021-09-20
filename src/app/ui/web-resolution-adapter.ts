@@ -8,9 +8,9 @@ export class WebResolutionAdapter implements IResolutionAdapter {
 
   public static readonly indent = 2;
 
-  public static readonly minWidth = 640;
+  public static readonly minWidth = 140;
 
-  public static readonly minHeight = 480;
+  public static readonly minHeight = 50;
 
   public readonly onChange: EventEmitter<ISize>;
 

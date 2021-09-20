@@ -1,11 +1,7 @@
 import {
-  crystalBlueSpriteFrames,
   crystalBlueSpriteUrl,
-  crystalGreenSpriteFrames,
   crystalGreenSpriteUrl,
-  crystalGreySpriteFrames,
   crystalGreySpriteUrl,
-  crystalRedSpriteFrames,
   crystalRedSpriteUrl,
   levelDemoImgUrl,
 } from '../../assets';
@@ -74,7 +70,7 @@ export class DemoLevel extends Level {
 
     const entities: GameEntity[] = [];
     const crystals = this.generateCrystals();
-    const targetColors = this.generateTargetColors();
+    const targetColors = this.getColors();
 
     const matrixLength = 2 * targetColors.length - 1;
 
@@ -113,6 +109,14 @@ export class DemoLevel extends Level {
 
   private _bgImg: IImg;
 
+  private getColors(mix = true): CrystalColor[] {
+    const colors: CrystalColor[] = [CrystalColor.Red, CrystalColor.Green, CrystalColor.Blue];
+    if (mix) {
+      return colors.sort(() => Utils.getRandomInteger(-1, 1));
+    }
+    return colors;
+  }
+
   private renderBackground(renderer: Renderer): void {
     if (!renderer) {
       throw new Error('Renderer is not specified.');
@@ -139,15 +143,10 @@ export class DemoLevel extends Level {
     });
   }
 
-  private generateTargetColors(): CrystalColor[] {
-    const colors: CrystalColor[] = [CrystalColor.Red, CrystalColor.Green, CrystalColor.Blue];
-    return colors.sort(() => Utils.getRandomInteger(-1, 1));
-  }
-
   private generateCrystals(): Crystal[] {
     const crystals: Crystal[] = [];
 
-    const colors: CrystalColor[] = this.generateTargetColors();
+    const colors: CrystalColor[] = this.getColors(false);
 
     const countOfColors = colors.length;
     const countOfCrystalsPerColor = 2 * countOfColors - 1;
@@ -173,19 +172,8 @@ export class DemoLevel extends Level {
       throw new Error('Crystal color is not specified.');
     }
 
-    const spriteUrlPerColorMap = new Map<CrystalColor, string>([
-      [CrystalColor.Grey, crystalGreySpriteUrl],
-      [CrystalColor.Red, crystalRedSpriteUrl],
-      [CrystalColor.Green, crystalGreenSpriteUrl],
-      [CrystalColor.Blue, crystalBlueSpriteUrl],
-    ]);
-
-    const spriteFramesPerColorMap = new Map<CrystalColor, number[][]>([
-      [CrystalColor.Grey, crystalGreySpriteFrames],
-      [CrystalColor.Red, crystalRedSpriteFrames],
-      [CrystalColor.Green, crystalGreenSpriteFrames],
-      [CrystalColor.Blue, crystalBlueSpriteFrames],
-    ]);
+    const spriteUrlPerColorMap = Crystal.spriteUrlPerColorMap;
+    const spriteFramesPerColorMap = Crystal.spriteFramesPerColorMap;
 
     const spriteImage = this.assetsManager.getImage(spriteUrlPerColorMap.get(color));
     const spriteFrames = spriteFramesPerColorMap.get(color);
