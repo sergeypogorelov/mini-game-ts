@@ -1,6 +1,7 @@
 import { IAnimator } from './core/interfaces/animator.interface';
 import { IDrawable } from './core/interfaces/drawable.interface';
 import { IResolutionAdapter } from './core/interfaces/resolution-adapter.interface';
+import { IPlayerInput } from './core/interfaces/player-input.interface';
 
 import { EventEmitter } from './core/event-emmiter';
 import { Renderer } from './core/renderer';
@@ -11,6 +12,7 @@ export interface IEngineConfig {
   readonly graphicContext: IDrawable;
   readonly resolutionAdapter: IResolutionAdapter;
   readonly animator: IAnimator;
+  readonly playerInput: IPlayerInput;
 }
 
 export abstract class Engine {
@@ -130,6 +132,21 @@ export abstract class Engine {
 
         if (this.isRenderingEnabled && this.isRenderable) {
           this.currentLevel.render(this.renderer);
+        }
+      } catch (e) {
+        if (e instanceof Error) {
+          this.onError.emit(e);
+        }
+
+        throw e;
+      }
+    });
+
+    this.engineConfig.playerInput.onScreenTouch.attach((pointInPixels) => {
+      try {
+        if (this.currentLevel) {
+          const pointInUnits = this.renderer.castPixelPointToUnit(pointInPixels);
+          this.currentLevel.touch(pointInUnits);
         }
       } catch (e) {
         if (e instanceof Error) {

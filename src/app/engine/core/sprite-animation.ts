@@ -18,6 +18,8 @@ export interface ISpriteAnimationConfig {
 export class SpriteAnimation implements IUpdateable {
   public static readonly defSpeed = 12;
 
+  public isPaused: boolean;
+
   public get timePerFrame(): number {
     return 1000 / this._config.speed;
   }
@@ -44,6 +46,10 @@ export class SpriteAnimation implements IUpdateable {
   }
 
   public update(dt: number): void {
+    if (this.isPaused) {
+      return;
+    }
+
     if (this._shouldPreventUpdateOnce) {
       this._shouldPreventUpdateOnce = false;
       return;

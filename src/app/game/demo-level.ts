@@ -1,6 +1,6 @@
 import { crystalYellowSpriteUrl, levelDemoImgUrl } from '../../assets';
 
-import { Point } from '../engine/core/point';
+import { IPoint, Point } from '../engine/core/point';
 import { IImg } from '../engine/core/img';
 import { Size } from '../engine/core/size';
 
@@ -9,6 +9,7 @@ import { AssetsManager } from '../engine/assets-manager';
 import { Level } from '../engine/level';
 
 import { Crystal } from './crystal';
+import { Utils } from '../engine/core/utils';
 
 export class DemoLevel extends Level {
   public constructor(assetsManager: AssetsManager) {
@@ -24,6 +25,16 @@ export class DemoLevel extends Level {
 
     this.renderBackground(renderer);
     this.renderEntities(renderer);
+  }
+
+  public touch(pointInUnits: IPoint): void {
+    const crystal = this._crystal;
+
+    if (Utils.checkTouch(pointInUnits, crystal.location, crystal.size)) {
+      crystal.freeze();
+    } else {
+      crystal.unfreeze();
+    }
   }
 
   protected imageIds: string[] = [levelDemoImgUrl, crystalYellowSpriteUrl];

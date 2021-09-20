@@ -29,6 +29,14 @@ export class Crystal extends Entity {
     this._spriteAnimation.render(renderer, location, size);
   }
 
+  public freeze(): void {
+    this._spriteAnimation.isPaused = true;
+  }
+
+  public unfreeze(): void {
+    this._spriteAnimation.isPaused = false;
+  }
+
   private _spriteAnimation: SpriteAnimation;
 
   private setSpriteAnimation(spriteImg: IImg): void {

@@ -78,6 +78,26 @@ export class Renderer {
     return new Size(sizeInUnits.width * xMultiplier, sizeInUnits.height * yMultiplier);
   }
 
+  public castPixelPointToUnit(pointInPixels: IPoint): IPoint {
+    if (!pointInPixels) {
+      throw new Error('Point in pixels is not defined.');
+    }
+
+    const { xIndent, yIndent, xMultiplier, yMultiplier } = this;
+
+    return new Point((pointInPixels.x - xIndent) / xMultiplier, (pointInPixels.y - yIndent) / yMultiplier);
+  }
+
+  public castPixelSizeToUnit(sizeInPixels: ISize): ISize {
+    if (!sizeInPixels) {
+      throw new Error('Size in pixels is not defined.');
+    }
+
+    const { xMultiplier, yMultiplier } = this;
+
+    return new Size(sizeInPixels.width / xMultiplier, sizeInPixels.height / yMultiplier);
+  }
+
   public clearContext(): void {
     this._context.clear();
   }

@@ -6,6 +6,7 @@ import { Game } from './game/game';
 import { WebAnimator } from './ui/web-animator';
 import { WebAssetsManager } from './ui/web-assets-manager';
 import { WebGraphicContext } from './ui/web-graphic-context';
+import { WebPlayerInput } from './ui/web-player-input';
 import { WebResolutionAdapter } from './ui/web-resolution-adapter';
 
 export class App {
@@ -44,12 +45,14 @@ export class App {
 
     const animator = new WebAnimator();
     const assetsManager = new WebAssetsManager();
+    const playerInput = new WebPlayerInput(canvasEl);
     const graphicContext = new WebGraphicContext(canvasEl, assetsManager);
 
     const engineCfg: IEngineConfig = {
       graphicContext,
       animator,
       resolutionAdapter,
+      playerInput,
     };
 
     const game = new Game(engineCfg);
@@ -60,6 +63,7 @@ export class App {
     this.rootEl.appendChild(canvasEl);
 
     animator.startAnimating();
+    playerInput.startHandling();
 
     game.setUpdatingStatus(true);
     game.setRenderingStatus(true);

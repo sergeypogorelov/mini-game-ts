@@ -2,6 +2,7 @@ import { AssetsManager } from './assets-manager';
 import { EventEmitter } from './core/event-emmiter';
 import { IRenderable } from './core/interfaces/renderable.interface';
 import { IUpdateable } from './core/interfaces/updateable.interface';
+import { IPoint } from './core/point';
 import { Renderer } from './core/renderer';
 import { ISize } from './core/size';
 
@@ -30,6 +31,8 @@ export abstract class Level implements IUpdateable, IRenderable {
   public abstract update(dt: number): void;
 
   public abstract render(renderer: Renderer): void;
+
+  public abstract touch(pointInUnits: IPoint): void;
 
   public async load(): Promise<Level> {
     this._isLoaded = false;
