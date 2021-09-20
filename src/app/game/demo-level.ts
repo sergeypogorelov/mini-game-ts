@@ -20,7 +20,9 @@ import { Utils } from '../engine/core/utils';
 import { AssetsManager } from '../engine/assets-manager';
 import { Level } from '../engine/level';
 
+import { GameEntity, GameEntityTypes } from './entities/game-entity';
 import { Crystal, CrystalColor } from './entities/crystal';
+import { EmptyCell } from './entities/empty-cell';
 
 export class DemoLevel extends Level {
   public constructor(assetsManager: AssetsManager) {
@@ -28,7 +30,9 @@ export class DemoLevel extends Level {
   }
 
   public update(dt: number): void {
-    this._crystal.update(dt);
+    this._entities.forEach((entity) => {
+      entity.update(dt);
+    });
   }
 
   public render(renderer: Renderer): void {
@@ -39,13 +43,22 @@ export class DemoLevel extends Level {
   }
 
   public touch(pointInUnits: IPoint): void {
-    const crystal = this._crystal;
+    this._entities.forEach((entity) => {
+      if (entity.type !== GameEntityTypes.Crystal) {
+        return;
+      }
 
-    if (Utils.checkTouch(pointInUnits, crystal.location, crystal.size)) {
-      crystal.freeze();
-    } else {
-      crystal.unfreeze();
-    }
+      const crystal = entity as Crystal;
+      if (crystal.color === CrystalColor.Grey) {
+        return;
+      }
+
+      if (Utils.checkTouch(pointInUnits, crystal.location, crystal.size)) {
+        crystal.freeze();
+      } else {
+        crystal.unfreeze();
+      }
+    });
   }
 
   protected imageIds: string[] = [
@@ -57,15 +70,48 @@ export class DemoLevel extends Level {
   ];
 
   protected loadEntities(): Promise<void> {
-    this._backgroundImg = this.assetsManager.getImage(levelDemoImgUrl);
-    this._crystal = this.createCrystal(new Point(0, 0), CrystalColor.Blue);
+    this._bgImg = this.assetsManager.getImage(levelDemoImgUrl);
+
+    const entities: GameEntity[] = [];
+    const crystals = this.generateCrystals();
+    const targetColors = this.generateTargetColors();
+
+    const matrixLength = 2 * targetColors.length - 1;
+
+    for (let i = 0; i < matrixLength; i++) {
+      const { width, height } = GameEntity.defSize;
+
+      for (let j = 0; j < matrixLength; j++) {
+        const newLocation = new Point(j * width, i * height);
+
+        if (j % 2 === 0) {
+          const crystal = crystals.pop();
+          crystal.changeLocation(newLocation);
+
+          entities.push(crystal);
+        } else {
+          if (i % 2 === 0) {
+            const crystal = this.createCrystal(newLocation, CrystalColor.Grey);
+            entities.push(crystal);
+          } else {
+            const emptyCell = new EmptyCell(newLocation);
+            entities.push(emptyCell);
+          }
+        }
+      }
+    }
+
+    this._targetColors = targetColors;
+    this._entities = entities;
 
     return Promise.resolve();
   }
 
-  private _crystal: Crystal;
+  private _targetColors: CrystalColor[];
 
-  private _backgroundImg: IImg;
+  private _entities: GameEntity[];
+
+  private _bgImg: IImg;
 
   private renderBackground(renderer: Renderer): void {
     if (!renderer) {
@@ -73,9 +119,9 @@ export class DemoLevel extends Level {
     }
 
     const params: IRenderParams = {
-      image: this._backgroundImg,
+      image: this._bgImg,
       srcPointInPixels: new Point(0, 0),
-      srcSizeInPixels: this._backgroundImg.size,
+      srcSizeInPixels: this._bgImg.size,
       destPointInUnits: new Point(0, 0),
       destSizeInUnits: this.size,
     };
@@ -88,7 +134,34 @@ export class DemoLevel extends Level {
       throw new Error('Renderer is not specified.');
     }
 
-    this._crystal.render(renderer);
+    this._entities.forEach((entity) => {
+      entity.render(renderer);
+    });
+  }
+
+  private generateTargetColors(): CrystalColor[] {
+    const colors: CrystalColor[] = [CrystalColor.Red, CrystalColor.Green, CrystalColor.Blue];
+    return colors.sort(() => Utils.getRandomInteger(-1, 1));
+  }
+
+  private generateCrystals(): Crystal[] {
+    const crystals: Crystal[] = [];
+
+    const colors: CrystalColor[] = this.generateTargetColors();
+
+    const countOfColors = colors.length;
+    const countOfCrystalsPerColor = 2 * countOfColors - 1;
+
+    for (let i = 0; i < colors.length; i++) {
+      const color = colors[i];
+
+      for (let j = 0; j < countOfCrystalsPerColor; j++) {
+        const crystal = this.createCrystal(new Point(0, 0), color);
+        crystals.push(crystal);
+      }
+    }
+
+    return crystals.sort(() => Utils.getRandomInteger(-1, 1));
   }
 
   private createCrystal(location: IPoint, color: CrystalColor): Crystal {

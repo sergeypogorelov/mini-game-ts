@@ -1,5 +1,5 @@
 import { IPoint } from '../../engine/core/point';
-import { ISize } from '../../engine/core/size';
+import { ISize, Size } from '../../engine/core/size';
 
 import { Entity } from '../../engine/entities/entity';
 
@@ -9,6 +9,8 @@ export enum GameEntityTypes {
 }
 
 export abstract class GameEntity extends Entity {
+  public static readonly defSize: ISize = new Size(5, 5);
+
   public get type(): GameEntityTypes {
     return this._type;
   }
@@ -20,6 +22,10 @@ export abstract class GameEntity extends Entity {
   }
 
   public abstract checkSwap(entity: GameEntity): boolean;
+
+  public changeLocation(newLocation: IPoint): void {
+    this.setLocation(newLocation);
+  }
 
   private _type: GameEntityTypes;
 

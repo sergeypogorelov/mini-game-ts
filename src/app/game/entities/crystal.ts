@@ -1,7 +1,6 @@
 import { IImg } from '../../engine/core/img';
 import { IPoint } from '../../engine/core/point';
 import { Renderer } from '../../engine/core/renderer';
-import { Size } from '../../engine/core/size';
 import { Sprite } from '../../engine/core/sprite';
 import { SpriteAnimation } from '../../engine/core/sprite-animation';
 
@@ -32,13 +31,13 @@ export class Crystal extends GameEntity {
 
   public readonly animationSpeedByColorMap = new Map<CrystalColor, number>([
     [CrystalColor.Grey, 0],
-    [CrystalColor.Red, 26],
-    [CrystalColor.Green, 20],
+    [CrystalColor.Red, 28],
+    [CrystalColor.Green, 18],
     [CrystalColor.Blue, 24],
   ]);
 
   public constructor(params: ICrystalParams) {
-    super(GameEntityTypes.Crystal, params?.location, new Size(5, 5));
+    super(GameEntityTypes.Crystal, params?.location, Crystal.defSize);
 
     this.setColor(params?.color);
     this.setSpriteAnimation(params?.spriteImage, params?.spriteFrames);

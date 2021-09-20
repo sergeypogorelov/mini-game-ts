@@ -2,6 +2,13 @@ import { IPoint } from './point';
 import { ISize } from './size';
 
 export class Utils {
+  public static getRandomInteger(min: number, max: number): number {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
   public static checkTouch(point: IPoint, targetPoint: IPoint, targetSize: ISize): boolean {
     if (!point) {
       throw new Error('Point is not specified.');
