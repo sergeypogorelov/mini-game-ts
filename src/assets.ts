@@ -58,4 +58,36 @@ export const crystalGreySpriteFrames: number[][] = [
 ];
 
 /* eslint-disable-next-line */
-export const crystalSoundUrl = require('./assets/sounds/crystal.mp3').default;
+export const explosionSpriteUrl = require('./assets/sprites/explosion.png').default;
+
+export const explosionSpriteFrames: number[][] = [
+  [0, 0, 100, 100],
+  [100, 0, 100, 100],
+  [200, 0, 100, 100],
+  [300, 0, 100, 100],
+  [400, 0, 100, 100],
+
+  [0, 100, 100, 100],
+  [100, 100, 100, 100],
+  [200, 100, 100, 100],
+  [300, 100, 100, 100],
+  [400, 100, 100, 100],
+
+  [0, 200, 100, 100],
+  [100, 200, 100, 100],
+  [200, 200, 100, 100],
+  [300, 200, 100, 100],
+  [400, 200, 100, 100],
+
+  [0, 300, 100, 100],
+  [100, 300, 100, 100],
+  [200, 300, 100, 100],
+  [300, 300, 100, 100],
+  [400, 300, 100, 100],
+
+  [0, 400, 100, 100],
+  [100, 400, 100, 100],
+  [200, 400, 100, 100],
+  [300, 400, 100, 100],
+  [400, 400, 100, 100],
+];

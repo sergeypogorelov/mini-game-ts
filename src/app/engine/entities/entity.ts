@@ -1,12 +1,16 @@
 import { IUpdateable } from '../core/interfaces/updateable.interface';
 import { IRenderable } from '../core/interfaces/renderable.interface';
+import { IDestroyable } from '../core/interfaces/destroyable.interface';
 
 import { IPoint } from '../core/point';
 import { ISize } from '../core/size';
 
+import { EventEmitter } from '../core/event-emmiter';
 import { Renderer } from '../core/renderer';
 
-export abstract class Entity implements IUpdateable, IRenderable {
+export abstract class Entity implements IUpdateable, IRenderable, IDestroyable {
+  public readonly onDisposalReady = new EventEmitter<void>();
+
   public get location(): IPoint {
     return this._location;
   }
@@ -23,6 +27,8 @@ export abstract class Entity implements IUpdateable, IRenderable {
   public abstract update(dt: number): void;
 
   public abstract render(renderer: Renderer): void;
+
+  public abstract destroy(): void;
 
   protected setLocation(location: IPoint): void {
     if (!location) {

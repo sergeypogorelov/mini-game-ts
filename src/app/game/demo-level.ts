@@ -3,7 +3,9 @@ import {
   crystalGreenSpriteUrl,
   crystalGreySpriteUrl,
   crystalRedSpriteUrl,
+  explosionSpriteUrl,
   levelDemoImgUrl,
+  explosionSpriteFrames,
 } from '../../assets';
 
 import { IPoint, Point } from '../engine/core/point';
@@ -73,6 +75,7 @@ export class DemoLevel extends Level {
     crystalGreenSpriteUrl,
     crystalBlueSpriteUrl,
     crystalGreySpriteUrl,
+    explosionSpriteUrl,
   ];
 
   protected loadEntities(): Promise<void> {
@@ -234,9 +237,13 @@ export class DemoLevel extends Level {
     const spriteImage = this.assetsManager.getImage(spriteUrlPerColorMap.get(color));
     const spriteFrames = spriteFramesPerColorMap.get(color);
 
+    const explosionSpriteImage = this.assetsManager.getImage(explosionSpriteUrl);
+
     return new Crystal({
       spriteImage,
       spriteFrames,
+      explosionSpriteImage,
+      explosionSpriteFrames,
       color,
       location,
     });
@@ -315,6 +322,7 @@ export class DemoLevel extends Level {
     this._onSwapCheck.attach((entity) => {
       const crystal = this._touchedCrystal;
 
+      /// TODO: move checkNeighbor to checkSwap
       if (crystal.checkNeighbor(entity) && crystal.checkSwap(entity)) {
         const crystalLocation = crystal.location;
         crystal.changeLocation(entity.location);
@@ -329,6 +337,17 @@ export class DemoLevel extends Level {
     this._onSwap.attach(() => {
       if (this.checkIfRiddleIsSolved()) {
         this.onVictory.emit();
+
+        const allEntities = [...this._entities, ...this._targetCrystals];
+
+        allEntities.forEach((entity) => {
+          entity.onDisposalReady.attach(() => {
+            this._targetCrystals = this._targetCrystals.filter((e) => e !== entity);
+            this._entities = this._entities.filter((e) => e !== entity);
+          });
+
+          entity.destroy();
+        });
       }
     });
   }

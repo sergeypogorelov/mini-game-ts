@@ -16,8 +16,6 @@ export interface IEngineConfig {
 }
 
 export abstract class Engine {
-  public readonly onEnd = new EventEmitter<void>();
-
   public readonly onError = new EventEmitter<Error>();
 
   public get isUpdatingEnabled(): boolean {

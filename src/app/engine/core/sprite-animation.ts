@@ -7,6 +7,7 @@ import { ISpriteFrame, Sprite } from './sprite';
 import { IRenderParams, Renderer } from './renderer';
 
 import { EveryTimeSchedule } from '../schedules/every-time-schedule';
+import { EventEmitter } from './event-emmiter';
 
 export interface ISpriteAnimationConfig {
   readonly sprite: Sprite;
@@ -18,7 +19,13 @@ export interface ISpriteAnimationConfig {
 export class SpriteAnimation implements IUpdateable {
   public static readonly defSpeed = 12;
 
+  public readonly onAnimationFinish = new EventEmitter<SpriteAnimation>();
+
   public isPaused: boolean;
+
+  public isFinished(): boolean {
+    return this._isFinished;
+  }
 
   public get timePerFrame(): number {
     return 1000 / this._config.speed;
@@ -164,6 +171,8 @@ export class SpriteAnimation implements IUpdateable {
         this.reset();
       } else {
         this._isFinished = true;
+
+        this.onAnimationFinish.emit(this);
       }
 
       this._shouldPreventUpdateOnce = true;

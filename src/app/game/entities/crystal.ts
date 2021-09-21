@@ -9,7 +9,7 @@ import {
   crystalRedSpriteUrl,
 } from '../../../assets';
 
-import { IPoint } from '../../engine/core/point';
+import { IPoint, Point } from '../../engine/core/point';
 import { IImg } from '../../engine/core/img';
 
 import { Sprite } from '../../engine/core/sprite';
@@ -27,14 +27,24 @@ export enum CrystalColor {
   Blue = 'blue',
 }
 
+export enum CrystalLeavingDirections {
+  Top = 'top',
+  Left = 'left',
+}
+
 export interface ICrystalParams {
   location: IPoint;
   spriteImage: IImg;
   spriteFrames: number[][];
+  explosionSpriteImage: IImg;
+  explosionSpriteFrames: number[][];
   color: CrystalColor;
 }
 
 export class Crystal extends GameEntity {
+  public static readonly leavingSpeed = 6;
+  public static readonly explosionAnimationSpeed = 15;
+
   public static readonly spriteUrlPerColorMap = new Map<CrystalColor, string>([
     [CrystalColor.Grey, crystalGreySpriteUrl],
     [CrystalColor.Red, crystalRedSpriteUrl],
@@ -60,6 +70,14 @@ export class Crystal extends GameEntity {
     return this._isFrozen;
   }
 
+  public get isLeaving(): boolean {
+    return this._isLeaving;
+  }
+
+  public get isExploding(): boolean {
+    return this._isExploding;
+  }
+
   public get color(): CrystalColor {
     return this._color;
   }
@@ -68,23 +86,49 @@ export class Crystal extends GameEntity {
     return this._spriteAnimation;
   }
 
+  public get explosionSpriteAnimation(): SpriteAnimation {
+    return this._explosionSpriteAnimation;
+  }
+
   public constructor(params: ICrystalParams) {
     super(GameEntityTypes.Crystal, params?.location, Crystal.defSize);
 
     this.setColor(params?.color);
     this.setSpriteAnimation(params?.spriteImage, params?.spriteFrames);
+    this.setExplosionSpriteAnimation(params?.explosionSpriteImage, params?.explosionSpriteFrames);
   }
 
   public update(dt: number): void {
-    if (this.color === CrystalColor.Grey) {
-      return;
-    }
+    if (this.isExploding) {
+      this.explosionSpriteAnimation.update(dt);
+    } else {
+      this.spriteAnimation.update(dt);
 
-    this.spriteAnimation.update(dt);
+      if (this.isLeaving) {
+        this.updateLeavingLocation(dt);
+      }
+    }
   }
 
   public render(renderer: Renderer): void {
-    this.spriteAnimation.render(renderer, this.location, this.size);
+    if (this.isExploding) {
+      this.explosionSpriteAnimation.render(renderer, this.location, this.size);
+    } else {
+      this.spriteAnimation.render(renderer, this.location, this.size);
+    }
+  }
+
+  public destroy(): void {
+    if (this.isLeaving) {
+      return;
+    }
+
+    this._isLeaving = true;
+
+    const crystalLeavingDirections = Object.values(CrystalLeavingDirections);
+    const randomIndex = Utils.getRandomInteger(0, crystalLeavingDirections.length - 1);
+
+    this._leavingDirection = crystalLeavingDirections[randomIndex];
   }
 
   public checkSwap(entity: GameEntity): boolean {
@@ -116,9 +160,41 @@ export class Crystal extends GameEntity {
 
   private _isFrozen: boolean;
 
+  private _isLeaving: boolean;
+
+  private _isExploding: boolean;
+
+  private _leavingDirection: CrystalLeavingDirections;
+
   private _color: CrystalColor;
 
   private _spriteAnimation: SpriteAnimation;
+
+  private _explosionSpriteAnimation: SpriteAnimation;
+
+  private updateLeavingLocation(dt: number): void {
+    if (!this.isLeaving || this.isExploding) {
+      return;
+    }
+
+    const { x: cx, y: cy } = this.location;
+
+    if (cx <= 0 || cy <= 0) {
+      this._isExploding = true;
+      return;
+    }
+
+    let nx = cx;
+    let ny = cy;
+
+    if (this._leavingDirection === CrystalLeavingDirections.Top) {
+      ny = cy - (Crystal.leavingSpeed * dt) / 1000;
+    } else if (this._leavingDirection === CrystalLeavingDirections.Left) {
+      nx = cx - (Crystal.leavingSpeed * dt) / 1000;
+    }
+
+    this.changeLocation(new Point(nx, ny));
+  }
 
   private setColor(color: CrystalColor): void {
     if (!color) {
@@ -151,5 +227,27 @@ export class Crystal extends GameEntity {
       const randomNumber = Utils.getRandomInteger(0, spriteAnimation.countOfFrames - 1);
       spriteAnimation.forceFrameIndex(randomNumber);
     }
+  }
+
+  private setExplosionSpriteAnimation(spriteImage: IImg, spriteFrames: number[][]): void {
+    if (!spriteImage) {
+      throw new Error('Explosion sprite image is not specified.');
+    }
+
+    if (!spriteFrames) {
+      throw new Error('Explosion sprite frames are not specified.');
+    }
+
+    const sprite = Sprite.createFromArray(spriteImage, spriteFrames);
+    const speed = Crystal.explosionAnimationSpeed;
+
+    this._explosionSpriteAnimation = new SpriteAnimation({
+      sprite,
+      speed,
+    });
+
+    this._explosionSpriteAnimation.onAnimationFinish.attach(() => {
+      this.onDisposalReady.emit();
+    });
   }
 }

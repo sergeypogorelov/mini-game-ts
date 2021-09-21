@@ -16,6 +16,10 @@ export class EmptyCell extends GameEntity {
     /// nothing to render
   }
 
+  public destroy(): void {
+    this.onDisposalReady.emit();
+  }
+
   public checkSwap(entity: GameEntity): boolean {
     if (!entity) {
       throw new Error('Entity is not specified.');
