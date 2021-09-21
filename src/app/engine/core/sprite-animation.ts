@@ -28,6 +28,10 @@ export class SpriteAnimation implements IUpdateable {
     return this.timePerFrame * this._config.sprite.frames.length;
   }
 
+  public get countOfFrames(): number {
+    return this._config.sprite.frames.length;
+  }
+
   public constructor(config: ISpriteAnimationConfig) {
     this.setConfig(config);
     this.setSchedules();
@@ -35,6 +39,10 @@ export class SpriteAnimation implements IUpdateable {
 
   public getCurrentFrame(): ISpriteFrame {
     let index = this._currentFrameIndex;
+
+    if (typeof this._forcedFrameIndex === 'number') {
+      index = this._forcedFrameIndex;
+    }
 
     const { frames } = this._config.sprite;
     if (index >= frames.length) {
@@ -85,11 +93,33 @@ export class SpriteAnimation implements IUpdateable {
     this._allFramesSchedule.reset();
   }
 
+  public forceFrameIndex(frameIndex: number): void {
+    if (frameIndex < 0) {
+      throw new Error('Frame index cannot be less than 0.');
+    }
+
+    if (frameIndex >= this.countOfFrames) {
+      throw new Error('Frame index is out of range.');
+    }
+
+    this.isPaused = true;
+
+    this._forcedFrameIndex = frameIndex;
+  }
+
+  public unforceFrameIndex(): void {
+    this.isPaused = false;
+
+    this._forcedFrameIndex = null;
+  }
+
   private _isFinished = false;
 
   private _shouldPreventUpdateOnce = false;
 
   private _currentFrameIndex = 0;
+
+  private _forcedFrameIndex: number = null;
 
   private _config: ISpriteAnimationConfig;
 

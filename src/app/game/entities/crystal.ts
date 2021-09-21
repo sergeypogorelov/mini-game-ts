@@ -16,6 +16,7 @@ import { Sprite } from '../../engine/core/sprite';
 import { SpriteAnimation } from '../../engine/core/sprite-animation';
 
 import { Renderer } from '../../engine/core/renderer';
+import { Utils } from '../../engine/core/utils';
 
 import { GameEntity, GameEntityTypes } from './game-entity';
 
@@ -136,5 +137,11 @@ export class Crystal extends GameEntity {
       speed,
       isInfinite: true,
     });
+
+    if (this.color === CrystalColor.Grey) {
+      const { spriteAnimation } = this;
+      const randomNumber = Utils.getRandomInteger(0, spriteAnimation.countOfFrames - 1);
+      spriteAnimation.forceFrameIndex(randomNumber);
+    }
   }
 }
