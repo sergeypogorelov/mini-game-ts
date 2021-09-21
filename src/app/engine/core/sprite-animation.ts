@@ -113,6 +113,15 @@ export class SpriteAnimation implements IUpdateable {
     this._forcedFrameIndex = null;
   }
 
+  public setFramesOrder(isDefault: boolean): void {
+    const { sprite } = this._config;
+    if (isDefault) {
+      sprite.setDefaultOrderOfFrames();
+    } else {
+      sprite.setReversedOrderOfFrames();
+    }
+  }
+
   private _isFinished = false;
 
   private _shouldPreventUpdateOnce = false;

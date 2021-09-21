@@ -57,6 +57,15 @@ export class App {
 
     const game = new Game(engineCfg);
     game.changeCurrentLevel(new DemoLevel(assetsManager));
+    game.currentLevel.onVictory.attach(() => {
+      playerInput.stopHandling();
+
+      const darkLayerElement = this.createDarkLayerElement();
+      this.rootEl.appendChild(darkLayerElement);
+
+      const victoryElement = this.createVictoryElement();
+      this.rootEl.appendChild(victoryElement);
+    });
 
     await game.currentLevel.load();
 
@@ -80,6 +89,28 @@ export class App {
     canvas.height = height;
 
     return canvas;
+  }
+
+  private createDarkLayerElement(): HTMLDivElement {
+    const element = document.createElement('div');
+    element.id = 'dark-layer';
+
+    return element;
+  }
+
+  private createVictoryElement(): HTMLDivElement {
+    const element = document.createElement('div');
+    element.id = 'victory';
+
+    let messageEl = document.createElement('div');
+    messageEl.textContent = 'Riddle Solved!';
+    element.appendChild(messageEl);
+
+    messageEl = document.createElement('div');
+    messageEl.textContent = 'Congratulations!';
+    element.appendChild(messageEl);
+
+    return element;
   }
 
   private setRootElement(el: HTMLDivElement): void {

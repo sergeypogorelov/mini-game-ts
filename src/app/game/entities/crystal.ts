@@ -56,6 +56,10 @@ export class Crystal extends GameEntity {
     [CrystalColor.Blue, 22],
   ]);
 
+  public get isFrozen(): boolean {
+    return this._isFrozen;
+  }
+
   public get color(): CrystalColor {
     return this._color;
   }
@@ -101,12 +105,16 @@ export class Crystal extends GameEntity {
   }
 
   public freeze(): void {
+    this._isFrozen = true;
     this.spriteAnimation.isPaused = true;
   }
 
   public unfreeze(): void {
+    this._isFrozen = false;
     this.spriteAnimation.isPaused = false;
   }
+
+  private _isFrozen: boolean;
 
   private _color: CrystalColor;
 

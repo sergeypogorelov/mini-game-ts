@@ -10,6 +10,7 @@ import { IPoint, Point } from '../engine/core/point';
 import { IImg } from '../engine/core/img';
 import { Size } from '../engine/core/size';
 
+import { EventEmitter } from '../engine/core/event-emmiter';
 import { IRenderParams, Renderer } from '../engine/core/renderer';
 import { Utils } from '../engine/core/utils';
 
@@ -20,12 +21,27 @@ import { GameEntity, GameEntityTypes } from './entities/game-entity';
 import { Crystal, CrystalColor } from './entities/crystal';
 import { EmptyCell } from './entities/empty-cell';
 
+export interface IDemoLevelMatrixData {
+  matrixLength: number;
+  matrtixWidth: number;
+  matrixHeight: number;
+  xIndent: number;
+  yIndent: number;
+  yIndentForMatrix: number;
+}
+
 export class DemoLevel extends Level {
   public constructor(assetsManager: AssetsManager) {
     super(assetsManager, new Size(70, 40));
+
+    this.setEventHandlers();
   }
 
   public update(dt: number): void {
+    this._targetCrystals.forEach((crystal) => {
+      crystal.update(dt);
+    });
+
     this._entities.forEach((entity) => {
       entity.update(dt);
     });
@@ -39,22 +55,16 @@ export class DemoLevel extends Level {
   }
 
   public touch(pointInUnits: IPoint): void {
-    this._entities.forEach((entity) => {
-      if (entity.type !== GameEntityTypes.Crystal) {
-        return;
-      }
-
-      const crystal = entity as Crystal;
-      if (crystal.color === CrystalColor.Grey) {
-        return;
-      }
-
-      if (Utils.checkTouch(pointInUnits, crystal.location, crystal.size)) {
-        crystal.freeze();
-      } else {
-        crystal.unfreeze();
-      }
+    const touchedEntity = this._entities.find((entity) => {
+      const { location, size } = entity;
+      return Utils.checkTouch(pointInUnits, location, size);
     });
+
+    if (touchedEntity) {
+      this._onTouch.emit(touchedEntity);
+    } else {
+      this._onFailedTouch.emit();
+    }
   }
 
   protected imageIds: string[] = [
@@ -68,17 +78,29 @@ export class DemoLevel extends Level {
   protected loadEntities(): Promise<void> {
     this._bgImg = this.assetsManager.getImage(levelDemoImgUrl);
 
+    const targetCrystals: Crystal[] = [];
     const entities: GameEntity[] = [];
-    const crystals = this.generateCrystals();
-    const targetColors = this.getColors();
 
-    const matrixLength = 2 * targetColors.length - 1;
+    const targetColors = this.getColors();
+    const crystals = this.generateCrystals();
+
+    const { matrixLength, xIndent, yIndent, yIndentForMatrix } = this.getMatrixData();
+
+    for (let i = 0; i < matrixLength; i += 2) {
+      const location = new Point(i * GameEntity.defSize.width + xIndent, yIndent);
+
+      const color = targetColors.pop();
+      const crystal = this.createCrystal(location, color);
+      crystal.spriteAnimation.setFramesOrder(false);
+
+      targetCrystals.push(crystal);
+    }
 
     for (let i = 0; i < matrixLength; i++) {
       const { width, height } = GameEntity.defSize;
 
       for (let j = 0; j < matrixLength; j++) {
-        const newLocation = new Point(j * width, i * height);
+        const newLocation = new Point(j * width + xIndent, i * height + yIndent + height + yIndentForMatrix);
 
         if (j % 2 === 0) {
           const crystal = crystals.pop();
@@ -97,13 +119,23 @@ export class DemoLevel extends Level {
       }
     }
 
-    this._targetColors = targetColors;
+    this._targetCrystals = targetCrystals;
     this._entities = entities;
 
     return Promise.resolve();
   }
 
-  private _targetColors: CrystalColor[];
+  private _onTouch: EventEmitter<GameEntity>;
+
+  private _onFailedTouch: EventEmitter<void>;
+
+  private _onSwapCheck: EventEmitter<GameEntity>;
+
+  private _onSwap: EventEmitter<void>;
+
+  private _touchedCrystal: Crystal;
+
+  private _targetCrystals: Crystal[];
 
   private _entities: GameEntity[];
 
@@ -115,6 +147,26 @@ export class DemoLevel extends Level {
       return colors.sort(() => Utils.getRandomInteger(-1, 1));
     }
     return colors;
+  }
+
+  private getMatrixData(): IDemoLevelMatrixData {
+    const matrixLength = 2 * this.getColors().length - 1;
+
+    const yIndentForMatrix = GameEntity.defSize.height * 0.5;
+    const matrtixWidth = matrixLength * GameEntity.defSize.width;
+    const matrixHeight = matrixLength * GameEntity.defSize.height + GameEntity.defSize.height + yIndentForMatrix;
+
+    const xIndent = Math.floor((this.size.width - matrtixWidth) / 2);
+    const yIndent = Math.floor((this.size.height - matrixHeight) / 2);
+
+    return {
+      matrixLength,
+      matrtixWidth,
+      matrixHeight,
+      xIndent,
+      yIndent,
+      yIndentForMatrix,
+    };
   }
 
   private renderBackground(renderer: Renderer): void {
@@ -137,6 +189,10 @@ export class DemoLevel extends Level {
     if (!renderer) {
       throw new Error('Renderer is not specified.');
     }
+
+    this._targetCrystals.forEach((crystal) => {
+      crystal.render(renderer);
+    });
 
     this._entities.forEach((entity) => {
       entity.render(renderer);
@@ -183,6 +239,97 @@ export class DemoLevel extends Level {
       spriteFrames,
       color,
       location,
+    });
+  }
+
+  private checkIfRiddleIsSolved(): boolean {
+    const { width: entityWidth, height: entityHeight } = GameEntity.defSize;
+    const { matrixLength, xIndent, yIndent, yIndentForMatrix } = this.getMatrixData();
+
+    const matrix: GameEntity[][] = [];
+
+    this._entities.forEach((entity) => {
+      const { x, y } = entity.location;
+
+      const i = (y - yIndent - yIndentForMatrix - entityHeight) / entityHeight;
+      const j = (x - xIndent) / entityWidth;
+
+      if (!matrix[j]) {
+        matrix[j] = [];
+      }
+
+      matrix[j][i] = entity;
+    });
+
+    const targetCrystals = this._targetCrystals.slice();
+
+    for (let i = 0; i < matrixLength; i += 2) {
+      const requiredCrystal = targetCrystals.shift();
+      const requiredColor = requiredCrystal.color;
+
+      const isColumnValid = matrix[i].every((entity) => {
+        if (entity.type !== GameEntityTypes.Crystal) {
+          return false;
+        }
+
+        const crystal = entity as Crystal;
+        return crystal.color === requiredColor;
+      });
+
+      if (!isColumnValid) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private setEventHandlers(): void {
+    this._onTouch = new EventEmitter<GameEntity>();
+    this._onFailedTouch = new EventEmitter<void>();
+    this._onSwapCheck = new EventEmitter<GameEntity>();
+    this._onSwap = new EventEmitter<void>();
+
+    this._onTouch.attach((entity) => {
+      if (this._touchedCrystal) {
+        this._onSwapCheck.emit(entity);
+      } else if (entity.type === GameEntityTypes.Crystal) {
+        const crystal = entity as Crystal;
+        crystal.freeze();
+
+        this._touchedCrystal = crystal;
+      } else {
+        this._onFailedTouch.emit();
+      }
+    });
+
+    this._onFailedTouch.attach(() => {
+      const crystal = this._touchedCrystal;
+
+      if (crystal) {
+        crystal.unfreeze();
+        this._touchedCrystal = null;
+      }
+    });
+
+    this._onSwapCheck.attach((entity) => {
+      const crystal = this._touchedCrystal;
+
+      if (crystal.checkNeighbor(entity) && crystal.checkSwap(entity)) {
+        const crystalLocation = crystal.location;
+        crystal.changeLocation(entity.location);
+        entity.changeLocation(crystalLocation);
+
+        this._onSwap.emit();
+      }
+
+      this._onFailedTouch.emit();
+    });
+
+    this._onSwap.attach(() => {
+      if (this.checkIfRiddleIsSolved()) {
+        this.onVictory.emit();
+      }
     });
   }
 }
