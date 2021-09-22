@@ -20,7 +20,7 @@ import { Utils } from '../../engine/core/utils';
 
 import { GameEntity, GameEntityTypes } from './game-entity';
 
-export enum CrystalColor {
+export enum CrystalColors {
   Grey = 'grey',
   Red = 'red',
   Green = 'green',
@@ -38,32 +38,32 @@ export interface ICrystalParams {
   spriteFrames: number[][];
   explosionSpriteImage: IImg;
   explosionSpriteFrames: number[][];
-  color: CrystalColor;
+  color: CrystalColors;
 }
 
 export class Crystal extends GameEntity {
   public static readonly leavingSpeed = 6;
   public static readonly explosionAnimationSpeed = 15;
 
-  public static readonly spriteUrlPerColorMap = new Map<CrystalColor, string>([
-    [CrystalColor.Grey, crystalGreySpriteUrl],
-    [CrystalColor.Red, crystalRedSpriteUrl],
-    [CrystalColor.Green, crystalGreenSpriteUrl],
-    [CrystalColor.Blue, crystalBlueSpriteUrl],
+  public static readonly spriteUrlPerColorMap = new Map<CrystalColors, string>([
+    [CrystalColors.Grey, crystalGreySpriteUrl],
+    [CrystalColors.Red, crystalRedSpriteUrl],
+    [CrystalColors.Green, crystalGreenSpriteUrl],
+    [CrystalColors.Blue, crystalBlueSpriteUrl],
   ]);
 
-  public static readonly spriteFramesPerColorMap = new Map<CrystalColor, number[][]>([
-    [CrystalColor.Grey, crystalGreySpriteFrames],
-    [CrystalColor.Red, crystalRedSpriteFrames],
-    [CrystalColor.Green, crystalGreenSpriteFrames],
-    [CrystalColor.Blue, crystalBlueSpriteFrames],
+  public static readonly spriteFramesPerColorMap = new Map<CrystalColors, number[][]>([
+    [CrystalColors.Grey, crystalGreySpriteFrames],
+    [CrystalColors.Red, crystalRedSpriteFrames],
+    [CrystalColors.Green, crystalGreenSpriteFrames],
+    [CrystalColors.Blue, crystalBlueSpriteFrames],
   ]);
 
-  public static readonly animationSpeedByColorMap = new Map<CrystalColor, number>([
-    [CrystalColor.Grey, 0],
-    [CrystalColor.Red, 24],
-    [CrystalColor.Green, 18],
-    [CrystalColor.Blue, 22],
+  public static readonly animationSpeedByColorMap = new Map<CrystalColors, number>([
+    [CrystalColors.Grey, 0],
+    [CrystalColors.Red, 24],
+    [CrystalColors.Green, 18],
+    [CrystalColors.Blue, 22],
   ]);
 
   public get isFrozen(): boolean {
@@ -78,7 +78,7 @@ export class Crystal extends GameEntity {
     return this._isExploding;
   }
 
-  public get color(): CrystalColor {
+  public get color(): CrystalColors {
     return this._color;
   }
 
@@ -132,7 +132,11 @@ export class Crystal extends GameEntity {
   }
 
   public checkSwap(entity: GameEntity): boolean {
-    if (this.color === CrystalColor.Grey) {
+    if (!this.checkNeighbor(entity)) {
+      return false;
+    }
+
+    if (this.color === CrystalColors.Grey) {
       return false;
     }
 
@@ -142,7 +146,7 @@ export class Crystal extends GameEntity {
 
     if (entity.type === GameEntityTypes.Crystal) {
       const crystal = entity as Crystal;
-      return crystal.color !== CrystalColor.Grey;
+      return crystal.color !== CrystalColors.Grey;
     }
 
     return false;
@@ -166,7 +170,7 @@ export class Crystal extends GameEntity {
 
   private _leavingDirection: CrystalLeavingDirections;
 
-  private _color: CrystalColor;
+  private _color: CrystalColors;
 
   private _spriteAnimation: SpriteAnimation;
 
@@ -196,7 +200,7 @@ export class Crystal extends GameEntity {
     this.changeLocation(new Point(nx, ny));
   }
 
-  private setColor(color: CrystalColor): void {
+  private setColor(color: CrystalColors): void {
     if (!color) {
       throw new Error('Crystal color is not specified.');
     }
@@ -222,7 +226,7 @@ export class Crystal extends GameEntity {
       isInfinite: true,
     });
 
-    if (this.color === CrystalColor.Grey) {
+    if (this.color === CrystalColors.Grey) {
       const { spriteAnimation } = this;
       const randomNumber = Utils.getRandomInteger(0, spriteAnimation.countOfFrames - 1);
       spriteAnimation.forceFrameIndex(randomNumber);

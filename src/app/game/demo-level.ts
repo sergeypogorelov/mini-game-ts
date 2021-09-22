@@ -20,7 +20,7 @@ import { AssetsManager } from '../engine/assets-manager';
 import { Level } from '../engine/level';
 
 import { GameEntity, GameEntityTypes } from './entities/game-entity';
-import { Crystal, CrystalColor } from './entities/crystal';
+import { Crystal, CrystalColors } from './entities/crystal';
 import { EmptyCell } from './entities/empty-cell';
 
 export interface IDemoLevelMatrixData {
@@ -33,8 +33,10 @@ export interface IDemoLevelMatrixData {
 }
 
 export class DemoLevel extends Level {
+  public static readonly defSize = new Size(70, 40);
+
   public constructor(assetsManager: AssetsManager) {
-    super(assetsManager, new Size(70, 40));
+    super(assetsManager, DemoLevel.defSize);
 
     this.setEventHandlers();
   }
@@ -112,7 +114,7 @@ export class DemoLevel extends Level {
           entities.push(crystal);
         } else {
           if (i % 2 === 0) {
-            const crystal = this.createCrystal(newLocation, CrystalColor.Grey);
+            const crystal = this.createCrystal(newLocation, CrystalColors.Grey);
             entities.push(crystal);
           } else {
             const emptyCell = new EmptyCell(newLocation);
@@ -144,8 +146,8 @@ export class DemoLevel extends Level {
 
   private _bgImg: IImg;
 
-  private getColors(mix = true): CrystalColor[] {
-    const colors: CrystalColor[] = [CrystalColor.Red, CrystalColor.Green, CrystalColor.Blue];
+  private getColors(mix = true): CrystalColors[] {
+    const colors: CrystalColors[] = [CrystalColors.Red, CrystalColors.Green, CrystalColors.Blue];
     if (mix) {
       return colors.sort(() => Utils.getRandomInteger(-1, 1));
     }
@@ -205,7 +207,7 @@ export class DemoLevel extends Level {
   private generateCrystals(): Crystal[] {
     const crystals: Crystal[] = [];
 
-    const colors: CrystalColor[] = this.getColors(false);
+    const colors: CrystalColors[] = this.getColors(false);
 
     const countOfColors = colors.length;
     const countOfCrystalsPerColor = 2 * countOfColors - 1;
@@ -222,7 +224,7 @@ export class DemoLevel extends Level {
     return crystals.sort(() => Utils.getRandomInteger(-1, 1));
   }
 
-  private createCrystal(location: IPoint, color: CrystalColor): Crystal {
+  private createCrystal(location: IPoint, color: CrystalColors): Crystal {
     if (!location) {
       throw new Error('Crystal location is not specified.');
     }
@@ -322,8 +324,7 @@ export class DemoLevel extends Level {
     this._onSwapCheck.attach((entity) => {
       const crystal = this._touchedCrystal;
 
-      /// TODO: move checkNeighbor to checkSwap
-      if (crystal.checkNeighbor(entity) && crystal.checkSwap(entity)) {
+      if (crystal.checkSwap(entity)) {
         const crystalLocation = crystal.location;
         crystal.changeLocation(entity.location);
         entity.changeLocation(crystalLocation);

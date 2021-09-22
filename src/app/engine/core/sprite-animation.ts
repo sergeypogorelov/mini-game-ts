@@ -3,11 +3,11 @@ import { IUpdateable } from './interfaces/updateable.interface';
 import { IPoint } from './point';
 import { ISize } from './size';
 
+import { EventEmitter } from './event-emmiter';
 import { ISpriteFrame, Sprite } from './sprite';
 import { IRenderParams, Renderer } from './renderer';
 
 import { EveryTimeSchedule } from '../schedules/every-time-schedule';
-import { EventEmitter } from './event-emmiter';
 
 export interface ISpriteAnimationConfig {
   readonly sprite: Sprite;

@@ -1,9 +1,9 @@
-import { IResolutionAdapter } from '../engine/core/interfaces/resolution-adapter.interface';
+import { IResolutionWatcher } from '../engine/core/interfaces/resolution-adapter.interface';
 
 import { ISize, Size } from '../engine/core/size';
 import { EventEmitter } from '../engine/core/event-emmiter';
 
-export class WebResolutionAdapter implements IResolutionAdapter {
+export class WebResolutionWatcher implements IResolutionWatcher {
   public static readonly defDelay = 20;
 
   public static readonly indent = 2;
@@ -23,23 +23,23 @@ export class WebResolutionAdapter implements IResolutionAdapter {
   }
 
   public get currentResolution(): ISize {
-    const indent = WebResolutionAdapter.indent;
+    const indent = WebResolutionWatcher.indent;
 
     let width = window.innerWidth - indent;
     let height = window.innerHeight - indent;
 
-    if (width < WebResolutionAdapter.minWidth) {
-      width = WebResolutionAdapter.minWidth;
+    if (width < WebResolutionWatcher.minWidth) {
+      width = WebResolutionWatcher.minWidth;
     }
 
-    if (height < WebResolutionAdapter.minHeight) {
-      height = WebResolutionAdapter.minHeight;
+    if (height < WebResolutionWatcher.minHeight) {
+      height = WebResolutionWatcher.minHeight;
     }
 
     return new Size(width, height);
   }
 
-  public constructor(delay = WebResolutionAdapter.defDelay) {
+  public constructor(delay = WebResolutionWatcher.defDelay) {
     this.setDelay(delay);
 
     this.onChange = new EventEmitter<ISize>();
@@ -47,7 +47,7 @@ export class WebResolutionAdapter implements IResolutionAdapter {
 
   public startWatching(): void {
     if (this.isInProgress) {
-      throw new Error('Resolution observing is already in progress.');
+      throw new Error('Resolution watching is already in progress.');
     }
 
     this._isInProgress = true;

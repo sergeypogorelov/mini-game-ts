@@ -1,4 +1,7 @@
+/* eslint-disable-next-line */
 const path = require('path');
+
+/* eslint-disable-next-line */
 const { merge } = require('webpack-merge');
 
 module.exports = merge(

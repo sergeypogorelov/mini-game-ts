@@ -7,7 +7,7 @@ import { WebAnimator } from './ui/web-animator';
 import { WebAssetsManager } from './ui/web-assets-manager';
 import { WebGraphicContext } from './ui/web-graphic-context';
 import { WebPlayerInput } from './ui/web-player-input';
-import { WebResolutionAdapter } from './ui/web-resolution-adapter';
+import { WebResolutionWatcher } from './ui/web-resolution-adapter';
 
 export class App {
   public get isRunning(): boolean {
@@ -29,19 +29,19 @@ export class App {
 
     this._isRunning = true;
 
-    const resolutionAdapter = new WebResolutionAdapter();
+    const resolutionWacther = new WebResolutionWatcher();
 
-    const currentResolution = resolutionAdapter.currentResolution;
+    const currentResolution = resolutionWacther.currentResolution;
     const canvasEl = this.createCanvasEl(currentResolution.width, currentResolution.height);
 
-    resolutionAdapter.onChange.attach(() => {
-      const { width, height } = resolutionAdapter.currentResolution;
+    resolutionWacther.onChange.attach(() => {
+      const { width, height } = resolutionWacther.currentResolution;
 
       canvasEl.width = width;
       canvasEl.height = height;
     });
 
-    resolutionAdapter.startWatching();
+    resolutionWacther.startWatching();
 
     const animator = new WebAnimator();
     const assetsManager = new WebAssetsManager();
@@ -51,7 +51,7 @@ export class App {
     const engineCfg: IEngineConfig = {
       graphicContext,
       animator,
-      resolutionAdapter,
+      resolutionWacther,
       playerInput,
     };
 

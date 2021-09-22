@@ -1,6 +1,6 @@
 import { IAnimator } from './core/interfaces/animator.interface';
 import { IDrawable } from './core/interfaces/drawable.interface';
-import { IResolutionAdapter } from './core/interfaces/resolution-adapter.interface';
+import { IResolutionWatcher } from './core/interfaces/resolution-adapter.interface';
 import { IPlayerInput } from './core/interfaces/player-input.interface';
 
 import { EventEmitter } from './core/event-emmiter';
@@ -10,7 +10,7 @@ import { Level } from './level';
 
 export interface IEngineConfig {
   readonly graphicContext: IDrawable;
-  readonly resolutionAdapter: IResolutionAdapter;
+  readonly resolutionWacther: IResolutionWatcher;
   readonly animator: IAnimator;
   readonly playerInput: IPlayerInput;
 }
@@ -75,13 +75,13 @@ export abstract class Engine {
     } else {
       const renderer = new Renderer(
         this.engineConfig.graphicContext,
-        this.engineConfig.resolutionAdapter.currentResolution,
+        this.engineConfig.resolutionWacther.currentResolution,
         level.size,
       );
 
       this.setRenderer(renderer);
 
-      this.engineConfig.resolutionAdapter.onChange.attach((newSizeInPixels) => {
+      this.engineConfig.resolutionWacther.onChange.attach((newSizeInPixels) => {
         this.renderer.changeSizeInPixels(newSizeInPixels);
       });
     }
