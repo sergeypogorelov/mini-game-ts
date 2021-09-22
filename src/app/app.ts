@@ -60,16 +60,13 @@ export class App {
     game.currentLevel.onVictory.attach(() => {
       playerInput.stopHandling();
 
-      const darkLayerElement = this.createDarkLayerElement();
-      this.rootEl.appendChild(darkLayerElement);
-
-      const victoryElement = this.createVictoryElement();
-      this.rootEl.appendChild(victoryElement);
+      this.addVictoryElements();
     });
 
     await game.currentLevel.load();
 
-    this.rootEl.appendChild(canvasEl);
+    this.removeLoaderElement();
+    this.addCanvas(canvasEl);
 
     animator.startAnimating();
     playerInput.startHandling();
@@ -93,14 +90,14 @@ export class App {
 
   private createDarkLayerElement(): HTMLDivElement {
     const element = document.createElement('div');
-    element.id = 'dark-layer';
+    element.classList.add('dark-layer');
 
     return element;
   }
 
   private createVictoryElement(): HTMLDivElement {
     const element = document.createElement('div');
-    element.id = 'victory';
+    element.classList.add('victory');
 
     let messageEl = document.createElement('div');
     messageEl.textContent = 'Riddle Solved!';
@@ -111,6 +108,27 @@ export class App {
     element.appendChild(messageEl);
 
     return element;
+  }
+
+  private addCanvas(canvasEl: HTMLCanvasElement): void {
+    if (!canvasEl) {
+      throw new Error('Canvas element is not specified.');
+    }
+
+    this._rootEl.appendChild(canvasEl);
+  }
+
+  private addVictoryElements(): void {
+    const darkLayerElement = this.createDarkLayerElement();
+    this.rootEl.appendChild(darkLayerElement);
+
+    const victoryElement = this.createVictoryElement();
+    this.rootEl.appendChild(victoryElement);
+  }
+
+  private removeLoaderElement(): void {
+    const el = document.querySelector('.loader-wrapper');
+    this._rootEl.removeChild(el);
   }
 
   private setRootElement(el: HTMLDivElement): void {

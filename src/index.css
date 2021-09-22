@@ -1,4 +1,4 @@
-body, #root {
+body, div {
   margin: 0;
   padding: 0;
 }
@@ -14,7 +14,7 @@ body {
   height: 100vh;
 }
 
-#dark-layer {
+.dark-layer {
   position: fixed;
   top: 0;
   right: 0;
@@ -23,7 +23,7 @@ body {
   background-color: rgba(0, 0, 0, 0.8);
 }
 
-#victory {
+.victory {
   position: fixed;
   top: 50%;
   left: 50%;
